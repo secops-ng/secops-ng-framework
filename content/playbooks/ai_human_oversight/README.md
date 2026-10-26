@@ -88,9 +88,13 @@ pinned by `tests/examples/ai_human_oversight/test_golden.py`.
 
 ## Status
 
-`maturity: experimental`, CORE-PRIM complete. Each of the five action
-steps has a deterministic primitive under `primitives/`, executed
-directly by `tests/playbooks/ai_human_oversight/test_primitives.py`.
+`maturity: stable`, `content_version` 1.0.0. All five action steps bind
+a deterministic primitive under `primitives/` through
+`x_secops_ng.core_body`, each executed directly by
+`tests/playbooks/ai_human_oversight/test_primitives.py`, and the three
+reference targets emit those calls. The graduation checklist recomputes
+green: tier A, 5 of 5 real bindings, zero placeholder bodies, zero blank
+predicates, zero schema errors, three-target goldens.
 Every rule below was checked against Art. 14 of Regulation (EU)
 2024/1689 on EUR-Lex.
 
@@ -130,11 +134,23 @@ Decisions the primitives fix:
   as exercised only when the roster was effective, every empowered
   overseer was briefed, and every flagged decision was dispositioned.
 
-**Owed: the wire.** The CACAO steps do not yet carry `core_body`, so
-`catalog.py` reports 0 of 5 bound. The CORE-WIRE card binds them,
-declares the adapter inputs (the roster entries, briefings, flagged
-decisions, reviews, the Art. 14(5) record and the interventions), and
-regenerates the three targets.
+Choices settled at the wire:
+
+- **The loop stays linear.** A roster that is not effective, or an
+  overseer who is not briefed, is the finding the evidence exists to
+  show, so it is recorded and carried into `oversight_exercised: false`
+  rather than short-circuited.
+- **`__oversight_cycle__` is bound as it is.** The primitives take the
+  RFC 3339 interval directly, so there is no second pair of window
+  variables.
+- **`__biometric_two_person_verification__` is a `dictionary`.** The
+  review primitive returns the Art. 14(5) record as an object, or null
+  when Art. 14(5) does not apply; it had been declared a string.
+- **The contract grows from 9 to 28 variables:** 14 adapter inputs (the
+  roster entries, briefings, flagged decisions, reviews and
+  interventions ride as JSON strings), one envelope per step, and the
+  seven existing fields, now extracted from those envelopes;
+  `__deployment_id__` and `__oversight_cycle__` stay the trigger inputs.
 
 ## Operator customisation
 

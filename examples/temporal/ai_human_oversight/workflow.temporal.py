@@ -20,138 +20,118 @@ _TRACER = trace.get_tracer(__name__)
 from ._audit_mirror import AuditRecord, AuditTrail
 
 @activity.defn
-async def establish_oversight_roster(deployment_id: str, oversight_cycle: str) -> str:
-    """resolve who holds human oversight of __deployment_id__ for __oversight_cycle__ and with what authority, and record the roster. Art. 26(2) makes the assignment; this step makes it operational for the window: which named persons or roles are on watch, what each is empowered to do, and who is reachable when an intervention is needed. The authority limb matters more than it looks — Art. 14(4)(d) and (e) require the overseer to be able to decide not to use the system, disregard or override its output, and interrupt operation, and a roster entry naming someone without that delegated power produces an overseer who cannot lawfully oversee. Read-only against the operator's governance and rota surfaces; this step records the resolved watch, it does not author the operator's delegation model.
+async def establish_oversight_roster(deployment_id: str, oversight_cycle: str, roster_entries: str, roster_resolved_at: str) -> dict[str, object]:
+    """Resolve who holds human oversight of __deployment_id__ for __oversight_cycle__ and with what authority, and record the roster. Art. 26(2) makes the assignment; this step makes it operational for the window: who is on watch, what each is empowered to do, and who is reachable. The authority limb matters most: Art. 14(4)(d) and (e) require the overseer to be able to decline to use the system, disregard, override or reverse its output, and intervene in or interrupt its operation, so an entry counts as empowered only as a natural person with a delegation record and all four powers, and the roster is effective only when one such person on watch is reachable. Produces __oversight_roster__, from which __oversight_roster_id__ is extracted.
 
     CACAO step_id: action--e14a5100-0000-4000-8000-000000000002
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--e14a5100-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e14a5100-0000-4000-8000-000000000002', 'secops_ng.step.name': 'establish_oversight_roster', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'establish_oversight_roster'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e14a5100-0000-4000-8000-000000000002', 'secops_ng.step.name': 'establish_oversight_roster', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'establish_oversight_roster'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--e14a5100-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e14a5100-0000-4000-8000-000000000002', 'secops_ng.step.name': 'establish_oversight_roster', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'establish_oversight_roster'})
+            AuditRecord(span_name='activity.action--e14a5100-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e14a5100-0000-4000-8000-000000000002', 'secops_ng.step.name': 'establish_oversight_roster', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'establish_oversight_roster'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--e14a5100-0000-4000-8000-000000000002'"
-        )
+        from content.playbooks.ai_human_oversight.primitives.roster import resolve_oversight_roster
+        __oversight_roster__ = resolve_oversight_roster(deployment_id=__deployment_id__, oversight_cycle=__oversight_cycle__, entries=__roster_entries__, resolved_at=__roster_resolved_at__)
 
 ESTABLISH_OVERSIGHT_ROSTER_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def brief_oversight_personnel(deployment_id: str, oversight_roster_id: str) -> str:
-    """brief the rostered overseers against the provider's Art. 13 instructions for use and record the briefing, discharging the competence limbs of Art. 14(4). Three capabilities are evidenced here: that the overseer understands the system's relevant capacities and limitations and can monitor operation well enough to detect anomalies, dysfunctions and unexpected performance (14(4)(a)); that they remain aware of the tendency to automatically rely or over-rely on the system's output, which the Regulation names explicitly as automation bias and which is a briefing subject rather than a personal failing (14(4)(b)); and that they can correctly interpret the output, which depends on the interpretation aids the provider supplied (14(4)(c)). The briefing is per-system, not generic security-awareness training: an overseer briefed on a different deployment has not been briefed on this one.
+async def brief_oversight_personnel(oversight_roster: dict[str, object], instructions_ref: str, briefings: str, briefing_recorded_at: str) -> dict[str, object]:
+    """Check that every empowered overseer holds a current briefing against the provider's Art. 13 instructions for use, discharging the competence limbs of Art. 14(4): understanding the system's capacities and limitations well enough to detect anomalies (14(4)(a)), awareness of automation bias (14(4)(b)), and correct interpretation of the output (14(4)(c)). The briefing is per system and per instructions: one recorded for another deployment or a superseded version does not count, and is kept on the record as rejected. Produces __briefing_record__, from which __briefing_record_id__ is extracted.
 
     CACAO step_id: action--e14a5100-0000-4000-8000-000000000003
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--e14a5100-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e14a5100-0000-4000-8000-000000000003', 'secops_ng.step.name': 'brief_oversight_personnel', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'brief_oversight_personnel'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e14a5100-0000-4000-8000-000000000003', 'secops_ng.step.name': 'brief_oversight_personnel', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'brief_oversight_personnel'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--e14a5100-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e14a5100-0000-4000-8000-000000000003', 'secops_ng.step.name': 'brief_oversight_personnel', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'brief_oversight_personnel'})
+            AuditRecord(span_name='activity.action--e14a5100-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e14a5100-0000-4000-8000-000000000003', 'secops_ng.step.name': 'brief_oversight_personnel', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'brief_oversight_personnel'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--e14a5100-0000-4000-8000-000000000003'"
-        )
+        from content.playbooks.ai_human_oversight.primitives.briefing import compose_briefing_record
+        __briefing_record__ = compose_briefing_record(roster=__oversight_roster__, instructions_ref=__instructions_ref__, briefings=__briefings__, recorded_at=__briefing_recorded_at__)
 
 BRIEF_OVERSIGHT_PERSONNEL_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def review_flagged_decisions(deployment_id: str, oversight_cycle: str, oversight_roster_id: str, briefing_record_id: str) -> dict[str, object]:
-    """run the standing review pass over the outputs and decisions flagged for oversight in __oversight_cycle__, and record the disposition of each. This is the routine body of the loop: most cycles produce reviews and no interventions, and the dated record of a review that found nothing is as much evidence of oversight as an intervention is. Carries the Art. 14(5) conditional branch: where the deployment is an Annex III point 1(a) remote biometric identification system, no action or decision may be taken on the basis of an identification unless that identification has been separately verified and confirmed by at least two natural persons who each carry the necessary competence, training and authority. The branch records both verifiers separately — one person confirming twice does not satisfy it. Where the operator relies on the narrow law-enforcement, migration, border-control or asylum exemption, the step records the Union or national legal basis relied on, not merely that the exemption was taken.
+async def review_flagged_decisions(oversight_roster: dict[str, object], briefing_record: dict[str, object], oversight_cycle: str, flagged_decisions: str, reviews: str, biometric_record: dict[str, object], reviewed_at: str) -> dict[str, object]:
+    """Run the standing review pass over the outputs and decisions flagged for oversight in __oversight_cycle__, and record the disposition of each: upheld, intervened, or unreviewed. Only an empowered, briefed overseer's review counts. A review that found nothing is as much evidence of oversight as an intervention. Carries the Art. 14(5) branch: for an Annex III point 1(a) remote biometric identification system, no action may be taken on an identification unless two separate qualified natural persons verified it, so an upheld identification without two permits no action, and one person confirming twice does not count. Where the law-enforcement, migration, border-control or asylum exemption is relied on, the record names the law relied on. Produces __review_disposition__, from which __review_disposition_id__ and __biometric_two_person_verification__ are extracted.
 
     CACAO step_id: action--e14a5100-0000-4000-8000-000000000004
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--e14a5100-0000-4000-8000-000000000004',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e14a5100-0000-4000-8000-000000000004', 'secops_ng.step.name': 'review_flagged_decisions', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'review_flagged_decisions'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e14a5100-0000-4000-8000-000000000004', 'secops_ng.step.name': 'review_flagged_decisions', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'review_flagged_decisions'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--e14a5100-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e14a5100-0000-4000-8000-000000000004', 'secops_ng.step.name': 'review_flagged_decisions', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'review_flagged_decisions'})
+            AuditRecord(span_name='activity.action--e14a5100-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e14a5100-0000-4000-8000-000000000004', 'secops_ng.step.name': 'review_flagged_decisions', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'review_flagged_decisions'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--e14a5100-0000-4000-8000-000000000004'"
-        )
+        from content.playbooks.ai_human_oversight.primitives.review import review_flagged_decisions
+        __review_disposition__ = review_flagged_decisions(roster=__oversight_roster__, briefing=__briefing_record__, oversight_cycle=__oversight_cycle__, flagged=__flagged_decisions__, reviews=__reviews__, biometric=__biometric_record__, reviewed_at=__reviewed_at__)
 
 REVIEW_FLAGGED_DECISIONS_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def record_intervention(deployment_id: str, review_disposition_id: str) -> dict[str, object]:
-    """where the review produced an exercise of Art. 14(4)(d) or (e), record the intervention against __deployment_id__. Four distinct exercises fall here and the record names which occurred, because they carry different weight on later review: a decision not to use the system in the particular situation; a decision to disregard its output; an override or reversal of that output; and an interruption of operation through a stop button or similar procedure. The record captures who intervened, on what basis, and what the system had produced — the last of these matters because an intervention is also a signal about the system, and it is the raw material the Art. 26(5) monitoring duty and the provider's Art. 72 post-market loop consume. A cycle with no intervention closes this step with a dated nil record rather than skipping it.
+async def record_intervention(review_disposition: dict[str, object], interventions: str, intervention_recorded_at: str) -> dict[str, object]:
+    """Record each exercise of Art. 14(4)(d) or (e) the review produced, naming which of the four occurred: declining to use the system, disregarding its output, overriding or reversing it, or interrupting its operation. Each record captures who intervened, on what basis, the latency from the flag, and what the system had produced, because an intervention is also a signal the Art. 26(5) monitoring duty and the provider's Art. 72 loop consume. The records must agree with the review, and a window with no intervention closes with a dated nil record. Produces __intervention_record__, from which __intervention_record_id__ and __intervention_type__ are extracted.
 
     CACAO step_id: action--e14a5100-0000-4000-8000-000000000005
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--e14a5100-0000-4000-8000-000000000005',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e14a5100-0000-4000-8000-000000000005', 'secops_ng.step.name': 'record_intervention', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'record_intervention'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e14a5100-0000-4000-8000-000000000005', 'secops_ng.step.name': 'record_intervention', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'record_intervention'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--e14a5100-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e14a5100-0000-4000-8000-000000000005', 'secops_ng.step.name': 'record_intervention', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'record_intervention'})
+            AuditRecord(span_name='activity.action--e14a5100-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e14a5100-0000-4000-8000-000000000005', 'secops_ng.step.name': 'record_intervention', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'record_intervention'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--e14a5100-0000-4000-8000-000000000005'"
-        )
+        from content.playbooks.ai_human_oversight.primitives.intervention import record_interventions
+        __intervention_record__ = record_interventions(disposition=__review_disposition__, interventions=__interventions__, recorded_at=__intervention_recorded_at__)
 
 RECORD_INTERVENTION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def emit_oversight_evidence(deployment_id: str, oversight_cycle: str, oversight_roster_id: str, briefing_record_id: str, review_disposition_id: str, intervention_record_id: str) -> str:
-    """compose the dated cycle-evidence artifact joining the roster, the briefings, the review dispositions and any interventions for __deployment_id__ over __oversight_cycle__, and write it to the operator's evidence store. This is what an auditor or market-surveillance authority reads to establish that oversight was not merely assigned but exercised — the distinction Art. 14 turns on, since a named overseer who never reviewed anything satisfies Art. 26(2) on paper and Art. 14 not at all. The evidence store is an operator-owned adapter-bound surface; the playbook declares the record shape and ships no store.
+async def emit_oversight_evidence(oversight_roster: dict[str, object], briefing_record: dict[str, object], review_disposition: dict[str, object], intervention_record: dict[str, object], workflow_id: str, execution_id: str, captured_at: str) -> dict[str, object]:
+    """Compose the dated cycle-evidence artifact joining the roster, the briefings, the review dispositions and the interventions for __deployment_id__ over __oversight_cycle__. This is what an auditor or market-surveillance authority reads to establish that oversight was exercised, not merely assigned: a named overseer who never reviewed anything satisfies Art. 26(2) on paper and Art. 14 not at all, so oversight counts as exercised only with an effective roster, everyone briefed, and every flagged decision dispositioned. The evidence store is an operator-owned surface. Produces __oversight_evidence__, from which __oversight_evidence_id__ is extracted.
 
     CACAO step_id: action--e14a5100-0000-4000-8000-000000000006
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--e14a5100-0000-4000-8000-000000000006',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e14a5100-0000-4000-8000-000000000006', 'secops_ng.step.name': 'emit_oversight_evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_oversight_evidence'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e14a5100-0000-4000-8000-000000000006', 'secops_ng.step.name': 'emit_oversight_evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_oversight_evidence'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--e14a5100-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--e14a5100-0000-4000-8000-000000000006', 'secops_ng.step.name': 'emit_oversight_evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_oversight_evidence'})
+            AuditRecord(span_name='activity.action--e14a5100-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--e14a5100-0000-4000-8000-000000000006', 'secops_ng.step.name': 'emit_oversight_evidence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'emit_oversight_evidence'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--e14a5100-0000-4000-8000-000000000006'"
-        )
+        from content.playbooks.ai_human_oversight.primitives.evidence import compose_oversight_evidence
+        __oversight_evidence__ = compose_oversight_evidence(roster=__oversight_roster__, briefing=__briefing_record__, disposition=__review_disposition__, intervention=__intervention_record__, workflow_id=__workflow_id__, execution_id=__execution_id__, captured_at=__captured_at__)
 
 EMIT_OVERSIGHT_EVIDENCE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @workflow.defn
@@ -160,115 +140,20 @@ class PlaybookAiHumanOversightV1Workflow:
 
     CACAO playbook id : playbook--e14a5100-0000-4000-8000-000000000001
     stable_id         : playbook.ai_human_oversight@v1
-    content_version   : 0.1.0
-    maturity          : experimental
+    content_version   : 1.0.0
+    maturity          : stable
     workflow_start    : start--e14a5100-0000-4000-8000-000000000001
     activities        : establish_oversight_roster, brief_oversight_personnel, review_flagged_decisions, record_intervention, emit_oversight_evidence
     """
-
-    # Human-in-the-loop scaffold for CACAO step action--e14a5100-0000-4000-8000-000000000002.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_establish_oversight_roster_decision is not None` before continuing.
-    _establish_oversight_roster_decision: bool | None = None
-    _establish_oversight_roster_reason: str | None = None
-
-    @workflow.signal
-    def establish_oversight_roster_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._establish_oversight_roster_decision = decision
-        self._establish_oversight_roster_reason = reason
-
-    @workflow.query
-    def establish_oversight_roster_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._establish_oversight_roster_decision is None:
-            return "pending"
-        return "approved" if self._establish_oversight_roster_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--e14a5100-0000-4000-8000-000000000003.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_brief_oversight_personnel_decision is not None` before continuing.
-    _brief_oversight_personnel_decision: bool | None = None
-    _brief_oversight_personnel_reason: str | None = None
-
-    @workflow.signal
-    def brief_oversight_personnel_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._brief_oversight_personnel_decision = decision
-        self._brief_oversight_personnel_reason = reason
-
-    @workflow.query
-    def brief_oversight_personnel_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._brief_oversight_personnel_decision is None:
-            return "pending"
-        return "approved" if self._brief_oversight_personnel_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--e14a5100-0000-4000-8000-000000000004.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_review_flagged_decisions_decision is not None` before continuing.
-    _review_flagged_decisions_decision: bool | None = None
-    _review_flagged_decisions_reason: str | None = None
-
-    @workflow.signal
-    def review_flagged_decisions_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._review_flagged_decisions_decision = decision
-        self._review_flagged_decisions_reason = reason
-
-    @workflow.query
-    def review_flagged_decisions_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._review_flagged_decisions_decision is None:
-            return "pending"
-        return "approved" if self._review_flagged_decisions_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--e14a5100-0000-4000-8000-000000000005.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_record_intervention_decision is not None` before continuing.
-    _record_intervention_decision: bool | None = None
-    _record_intervention_reason: str | None = None
-
-    @workflow.signal
-    def record_intervention_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._record_intervention_decision = decision
-        self._record_intervention_reason = reason
-
-    @workflow.query
-    def record_intervention_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._record_intervention_decision is None:
-            return "pending"
-        return "approved" if self._record_intervention_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--e14a5100-0000-4000-8000-000000000006.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_emit_oversight_evidence_decision is not None` before continuing.
-    _emit_oversight_evidence_decision: bool | None = None
-    _emit_oversight_evidence_reason: str | None = None
-
-    @workflow.signal
-    def emit_oversight_evidence_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._emit_oversight_evidence_decision = decision
-        self._emit_oversight_evidence_reason = reason
-
-    @workflow.query
-    def emit_oversight_evidence_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._emit_oversight_evidence_decision is None:
-            return "pending"
-        return "approved" if self._emit_oversight_evidence_decision else "denied"
 
     @workflow.run
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.ai_human_oversight@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.ai_human_oversight@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0'})
+                AuditRecord(span_name='workflow.playbook.ai_human_oversight@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--e14a5100-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.ai_human_oversight@v1'"

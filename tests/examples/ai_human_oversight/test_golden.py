@@ -15,7 +15,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from compilers._shared.cacao_parser import parse_file
+from compilers._shared.cacao_parser import parse_file, secops_extension
 from compilers.langgraph.emit import emit as emit_langgraph
 from compilers.n8n.emit import emit as emit_n8n
 from compilers.temporal.emit import emit_file as emit_temporal_file
@@ -129,3 +129,31 @@ def test_example_artifacts_are_committed() -> None:
     for path in (N8N_GOLDEN, TEMPORAL_GOLDEN, LANGGRAPH_GOLDEN):
         assert path.exists(), f"missing example artifact: {path}"
         assert path.stat().st_size > 0, f"empty example artifact: {path}"
+
+
+def test_core_body_steps_emit_code_nodes() -> None:
+    """Every bound step compiles to an n8n Code node that imports its
+    primitive and binds the declared ``out`` variable to the call.
+
+    Catches an emitter regression that byte-parity alone misses once a
+    careless regenerate bakes it into the golden. It does not catch
+    deliberate de-binding, which is a reviewable diff in both files.
+    """
+    raw = json.loads(SOURCE.read_text(encoding="utf-8"))
+    nodes_by_id = {n["id"]: n for n in json.loads(N8N_GOLDEN.read_text(encoding="utf-8"))["nodes"]}
+    bound = {sid: s for sid, s in raw["workflow"].items() if (secops_extension(s) or {}).get("core_body")}
+    assert len(bound) == 5, f"expected all five action steps bound, found {len(bound)}"
+    for step_id, step in bound.items():
+        node = nodes_by_id[step_id]
+        assert node["type"] == "n8n-nodes-base.code", f"{step_id}: {node['type']}"
+        body = node["parameters"].get("pythonCode", "")
+        module, _, fn = secops_extension(step)["core_body"]["primitive"].rpartition(".")
+        assert f"from {module} import {fn}" in body, f"{step_id}: primitive not imported"
+        assert f"{secops_extension(step)['core_body']['out']} = {fn}(" in body, f"{step_id}: call not bound"
+
+
+def test_the_art_14_5_record_is_declared_as_an_object() -> None:
+    """The review primitive returns the Art. 14(5) record as an object, or
+    null when Art. 14(5) does not apply, so the variable is a dictionary."""
+    raw = json.loads(SOURCE.read_text(encoding="utf-8"))
+    assert raw["playbook_variables"]["__biometric_two_person_verification__"]["type"] == "dictionary"

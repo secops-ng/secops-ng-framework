@@ -62,13 +62,17 @@ establish_oversight_roster
 Linear, five nodes, **no conditional edges**. The conditionality Art. 14
 contains lives in state rather than topology — see § 5.
 
-| step | article | produces |
-|---|---|---|
-| `establish_oversight_roster` | 14(4) | `__oversight_roster_id__` |
-| `brief_oversight_personnel` | 14(4)(a)–(c) | `__briefing_record_id__` |
-| `review_flagged_decisions` | 14(4), 14(5) | `__review_disposition_id__`, `__biometric_two_person_verification__` |
-| `record_intervention` | 14(4)(d)–(e) | `__intervention_record_id__`, `__intervention_type__` |
-| `emit_oversight_evidence` | 14(1) | `__oversight_evidence_id__` |
+Every step binds a deterministic primitive under
+`content/playbooks/ai_human_oversight/primitives/`, and its output
+envelope is what the next step reads:
+
+| step | article | primitive | produces |
+|---|---|---|---|
+| `establish_oversight_roster` | 14(4) | `roster.resolve_oversight_roster` | `__oversight_roster__` (and `__oversight_roster_id__`) |
+| `brief_oversight_personnel` | 14(4)(a)–(c) | `briefing.compose_briefing_record` | `__briefing_record__` (and `__briefing_record_id__`) |
+| `review_flagged_decisions` | 14(4), 14(5) | `review.review_flagged_decisions` | `__review_disposition__` (and `__review_disposition_id__`, `__biometric_two_person_verification__`) |
+| `record_intervention` | 14(4)(d)–(e) | `intervention.record_interventions` | `__intervention_record__` (and `__intervention_record_id__`, `__intervention_type__`) |
+| `emit_oversight_evidence` | 14(1) | `evidence.compose_oversight_evidence` | `__oversight_evidence__` (and `__oversight_evidence_id__`) |
 
 ### The roster's authority limb is the one that gets skipped
 
