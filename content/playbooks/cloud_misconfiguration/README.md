@@ -7,6 +7,7 @@ remediation → re-scan, with escalation if the re-scan fails.
 ## Contents
 
 - `playbook.cacao.json` — the CACAO v2 artifact (`playbook.cloud_misconfiguration@v1`).
+- `primitives/` — one deterministic primitive per action step (see Status).
 
 ## Worked example
 
@@ -36,6 +37,67 @@ Emitted artifacts and golden tests landed across the three CORE cards:
   `tests/compilers/langgraph/test_cloud_misconfiguration.py` (PR #85)
 
 This directory ships the portable content only.
+
+## Status
+
+`maturity: experimental`, CORE-PRIM complete. Each of the seven action
+steps has a deterministic primitive under `primitives/`, executed
+directly by `tests/playbooks/cloud_misconfiguration/test_primitives.py`.
+
+| Step | Primitive |
+|---|---|
+| ingest finding | `finding.normalise_posture_finding` |
+| enrich resource and owner | `context.resolve_resource_context` |
+| suppress and close | `suppression.compose_suppression_closure` |
+| notify owner | `notification.compose_owner_notification` |
+| guided remediation | `remediation.record_remediation_attempt` |
+| re-scan | `verification.verify_remediation` |
+| escalate | `escalation.compose_escalation` |
+
+Decisions the primitives fix:
+
+- **One deviation, one fingerprint.** The case fingerprint is the
+  baseline rule and the resource, so the same deviation reported by a
+  CSPM scan and by an IaC guardrail is the same deviation.
+- **Detection latency only when it can be measured.** The MTTD KPI is
+  stamped only when the adapter names the control-plane change that
+  introduced the deviation; the KPI excludes the rest.
+- **The owner fallback is recorded.** With no owner, or an inactive one,
+  in the ownership graph, the case goes to the operator's default pool
+  and every later record says so.
+- **Severity moves by the operator's policy.** The upstream severity is
+  shifted by the operator's per-classification table (-2 to +2 bands)
+  and clamped. A resource the inventory does not know is an inventory
+  gap and keeps its upstream severity; it is never lowered.
+- **Only a live, exact, time-boxed entry suppresses.** The ledger entry
+  must name this rule and this resource, be valid now and carry an
+  expiry; a compensating control must also be attested. Matching entries
+  that fail are listed with the reason. The closure is refused if the
+  entry has lapsed since the gate read it, and it never extends the
+  entry.
+- **Recurrence as the KRI defines it.** A finding recurs when a verified
+  remediation closed the same rule on the same cloud container before it
+  was first observed. A suppressed closure does not count, and without
+  an inventory record recurrence is unknown rather than false.
+- **Every remediation is attested.** The attempt cites its change
+  record; an automated hand-off (IaC change or runbook) also names the
+  operator's approver. The record carries the NIST SP 800-53 anchors of
+  the remediation branch.
+- **Verified means a fresh pass under the same baseline.** The re-scan
+  must target the same rule and resource. A result that is missing, that
+  predates the change, that was taken under another baseline version, or
+  that fails leaves the remediation unverified with that reason, and the
+  case escalates.
+- **Escalation is for unverified remediations only.** The payload
+  carries the attempted change and the failing evidence for the
+  security-engineering on-call.
+
+**Owed: the wire.** The CACAO steps do not yet carry `core_body`, so
+`catalog.py` reports 0 of 7 bound. The CORE-WIRE stage binds them,
+declares the adapter inputs (the finding, the inventory and ownership
+records, the severity policy, the exception ledger, the prior closures,
+the routing table, the runbook, the remediation attempt, the re-scan
+result and the paging channel), and regenerates the three targets.
 
 ## Regulatory cross-references
 
