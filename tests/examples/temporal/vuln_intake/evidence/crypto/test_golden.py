@@ -44,12 +44,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from jsonschema import Draft202012Validator
+import pytest
 
 from compilers._shared.evidence import (
     CryptoAttestationContext,
     SecretHandling,
 )
-from compilers.temporal.evidence import emit_crypto_attestation_artifact_activity
 
 REPO = Path(__file__).resolve().parents[6]
 SCHEMA = REPO / "schemas" / "evidence" / "crypto-attestation.schema.json"
@@ -114,6 +114,9 @@ def _replay(output_dir: Path) -> Path:
     worker uses. The activity returns the absolute artifact path as a
     string.
     """
+    pytest.importorskip("temporalio")
+    from compilers.temporal.evidence import emit_crypto_attestation_artifact_activity
+
     written_str = asyncio.run(
         emit_crypto_attestation_artifact_activity(CTX, output_dir)
     )

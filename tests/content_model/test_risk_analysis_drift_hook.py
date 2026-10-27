@@ -34,9 +34,6 @@ from compilers.langgraph.evidence.risk_analysis_node import (
 from compilers.n8n.evidence.risk_analysis_node import (
     emit_risk_analysis_artifact_n8n,
 )
-from compilers.temporal.evidence.risk_analysis_activity import (
-    emit_risk_analysis_artifact_activity,
-)
 
 
 def _ctx(**overrides) -> RiskAnalysisContext:
@@ -127,6 +124,11 @@ def test_default_hook_is_noop(tmp_path: Path) -> None:
 
 
 def test_temporal_adapter_threads_hook(tmp_path: Path) -> None:
+    pytest.importorskip("temporalio")
+    from compilers.temporal.evidence.risk_analysis_activity import (
+        emit_risk_analysis_artifact_activity,
+    )
+
     seen: list[DriftEvent] = []
     asyncio.run(
         emit_risk_analysis_artifact_activity(

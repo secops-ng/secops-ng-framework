@@ -36,9 +36,8 @@ import importlib.util
 import json
 from pathlib import Path
 
-from compilers.temporal.evidence import (
-    emit_interaction_evidence_artifact_activity,
-)
+import pytest
+
 
 REPO = Path(__file__).resolve().parents[3]
 EXAMPLE = REPO / "examples" / "temporal" / "it_security_support_agent"
@@ -118,6 +117,9 @@ def test_temporal_fixture_matches_n8n_fixture() -> None:
 
 
 def test_example_snapshot_matches_temporal_activity(tmp_path: Path) -> None:
+    pytest.importorskip("temporalio")
+    from compilers.temporal.evidence import emit_interaction_evidence_artifact_activity
+
     payload = _load_payload()
     written_str = asyncio.run(
         emit_interaction_evidence_artifact_activity(payload, tmp_path)
@@ -168,6 +170,9 @@ def test_temporal_activity_artifact_id_is_deterministic(tmp_path: Path) -> None:
     ``<workflow_id>|<execution_id>``) and ``artifact_id`` (SHA-256 of
     ``<incident_id>|<execution_id>``) collapse to the same bytes.
     """
+    pytest.importorskip("temporalio")
+    from compilers.temporal.evidence import emit_interaction_evidence_artifact_activity
+
     payload = _load_payload()
     first = Path(
         asyncio.run(

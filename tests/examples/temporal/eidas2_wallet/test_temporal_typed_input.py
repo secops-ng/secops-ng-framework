@@ -35,9 +35,8 @@ import importlib.util
 import json
 from pathlib import Path
 
-from compilers.temporal.patterns import (
-    materialise_wallet_attestation_input_activity,
-)
+import pytest
+
 
 REPO = Path(__file__).resolve().parents[4]
 EXAMPLE = REPO / "examples" / "temporal" / "eidas2_wallet"
@@ -97,6 +96,9 @@ def test_example_snapshot_matches_fixture() -> None:
 
 
 def test_example_snapshot_matches_temporal_activity(tmp_path: Path) -> None:
+    pytest.importorskip("temporalio")
+    from compilers.temporal.patterns import materialise_wallet_attestation_input_activity
+
     payload = _load_payload()
     result = asyncio.run(
         materialise_wallet_attestation_input_activity(payload, tmp_path)
@@ -143,6 +145,9 @@ def test_activity_output_shape() -> None:
 
 
 def test_activity_is_deterministic(tmp_path: Path) -> None:
+    pytest.importorskip("temporalio")
+    from compilers.temporal.patterns import materialise_wallet_attestation_input_activity
+
     payload = _load_payload()
     first = asyncio.run(
         materialise_wallet_attestation_input_activity(payload, tmp_path)

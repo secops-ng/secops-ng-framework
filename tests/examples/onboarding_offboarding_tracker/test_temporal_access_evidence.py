@@ -40,7 +40,8 @@ import importlib.util
 import json
 from pathlib import Path
 
-from compilers.temporal.evidence import emit_access_artifact_activity
+import pytest
+
 
 REPO = Path(__file__).resolve().parents[3]
 EXAMPLE = REPO / "examples" / "temporal" / "onboarding_offboarding_tracker"
@@ -144,6 +145,9 @@ def test_temporal_and_n8n_fixtures_agree_on_target_agnostic_fields() -> None:
 
 
 def test_example_snapshot_matches_temporal_activity(tmp_path: Path) -> None:
+    pytest.importorskip("temporalio")
+    from compilers.temporal.evidence import emit_access_artifact_activity
+
     ctx = _load_ctx()
     written_str = asyncio.run(
         emit_access_artifact_activity(ctx, tmp_path)
@@ -187,6 +191,9 @@ def test_example_snapshot_carries_expected_anchors() -> None:
 
 def test_temporal_adapter_artifact_id_is_deterministic(tmp_path: Path) -> None:
     """Same context → same artifact_id → byte-identical re-emission."""
+    pytest.importorskip("temporalio")
+    from compilers.temporal.evidence import emit_access_artifact_activity
+
     ctx = _load_ctx()
     first = Path(
         asyncio.run(emit_access_artifact_activity(ctx, tmp_path))

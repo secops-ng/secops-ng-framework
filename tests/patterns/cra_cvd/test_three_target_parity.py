@@ -18,6 +18,8 @@ import inspect
 from dataclasses import dataclass
 from datetime import date
 
+import pytest
+
 from patterns.cra_cvd import (
     CNARole,
     CSIRTCoordinationRequest,
@@ -37,6 +39,7 @@ from compilers.n8n.cra_cvd import (
     dispatch_cve_request_n8n,
     dispatch_pgp_delivery_n8n,
 )
+pytest.importorskip("temporalio")
 from compilers.temporal.cra_cvd import (
     dispatch_csirt_coordination_activity,
     dispatch_cve_request_activity,

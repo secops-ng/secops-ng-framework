@@ -40,6 +40,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from jsonschema import Draft202012Validator
+import pytest
 
 from compilers._shared.evidence import (
     EffectivenessContext,
@@ -48,7 +49,6 @@ from compilers._shared.evidence import (
     SourceShape,
     SubjectVersion,
 )
-from compilers.temporal.evidence import emit_effectiveness_artifact_activity
 
 REPO = Path(__file__).resolve().parents[6]
 SCHEMA = REPO / "schemas" / "evidence" / "effectiveness.schema.json"
@@ -114,6 +114,9 @@ def _validator() -> Draft202012Validator:
 
 def _replay(output_dir: Path) -> Path:
     """Drive the Temporal activity adapter exactly like a worker would."""
+    pytest.importorskip("temporalio")
+    from compilers.temporal.evidence import emit_effectiveness_artifact_activity
+
     written_str = asyncio.run(
         emit_effectiveness_artifact_activity(CTX, output_dir)
     )

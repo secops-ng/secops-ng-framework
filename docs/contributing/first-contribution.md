@@ -85,11 +85,15 @@ request.
 
 `[dev]` installs the tooling the *framework* needs. It deliberately does
 not install the orchestrator runtimes the **emitted** artifacts import —
-`temporalio`, `langchain_core`, `opentelemetry`. The framework never
-imports any of them: `compilers/_shared/observability.py` keeps the OTel
+`temporalio`, `langchain_core`, `opentelemetry`. The emitters never
+import any of them: `compilers/_shared/observability.py` keeps the OTel
 import inside the emitted text rather than at module scope, and the same
-holds for the other two. Installing them into every contributor's
-environment would contradict that.
+holds for the other two. The one exception is the Temporal activity
+modules under `compilers/temporal/` (`evidence/`, `patterns/`,
+`cra_cvd/`). They are worker-side code the operator runs, and they import
+`temporalio` when loaded, so a test that imports them needs the guard
+below. Installing the runtimes into every contributor's environment would
+contradict all of that.
 
 So a minimal `[dev]` install skips the tests that execute emitted source,
 and a full run reporting skips is healthy. The convention is
@@ -109,7 +113,10 @@ cannot tell those apart, which is exactly why the guard has to be there:
 `tests/compilers/langgraph/test_audit_mirror_emitter.py` guarded
 `langchain_core` but not `opentelemetry`, and a clean checkout errored on
 two tests until #888 fixed it. If you add a test that imports emitted
-source, add the guard in the same commit.
+source or a Temporal activity module, add the guard in the same commit.
+CI holds you to this: the `pytest.yml` workflow runs the suite once on a
+plain `.[dev]` install, where a missing guard fails as a collection
+error, and once with the runtimes installed, where the guarded tests run.
 
 ## 4. Branch from `main`
 

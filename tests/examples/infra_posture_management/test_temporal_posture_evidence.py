@@ -31,7 +31,8 @@ import importlib.util
 import json
 from pathlib import Path
 
-from compilers.temporal.evidence import emit_posture_artifact_activity
+import pytest
+
 
 REPO = Path(__file__).resolve().parents[3]
 EXAMPLE = REPO / "examples" / "temporal" / "infra_posture_management"
@@ -56,6 +57,9 @@ def test_example_snapshot_is_committed() -> None:
 
 
 def test_example_snapshot_matches_temporal_adapter(tmp_path: Path) -> None:
+    pytest.importorskip("temporalio")
+    from compilers.temporal.evidence import emit_posture_artifact_activity
+
     ctx = _load_ctx()
     written_str = asyncio.run(
         emit_posture_artifact_activity(ctx, tmp_path)

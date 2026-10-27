@@ -38,6 +38,28 @@ def playbook(fixture_data):
     return parse(deepcopy(fixture_data))
 
 
+_STUBBED = ("temporalio", "temporalio.activity", "temporalio.workflow", "temporalio.common",
+            "opentelemetry", "opentelemetry.trace")
+
+
+@pytest.fixture(autouse=True)
+def _restore_stubbed_runtimes():
+    """Take the runtime stubs ``_load_module`` installs out of ``sys.modules`` again.
+
+    Left in place, they make every later test in the session see a fake
+    ``temporalio`` and ``opentelemetry``: guarded tests run against the stubs
+    instead of skipping on a plain ``.[dev]`` install, and tests that need the
+    real runtime get the stub instead.
+    """
+    saved = {name: sys.modules.get(name) for name in _STUBBED}
+    yield
+    for name, module in saved.items():
+        if module is None:
+            sys.modules.pop(name, None)
+        else:
+            sys.modules[name] = module
+
+
 def _temporalio_stub() -> types.ModuleType:
     """Stub package mirroring the surface the generated module imports."""
 
