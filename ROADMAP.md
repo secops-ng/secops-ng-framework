@@ -2473,6 +2473,14 @@ one playbook's provenance.
 - **Source:** #921; Director decision 2026-09-04.
 - **Shipped via:**
   - PARK notes — (docs PR, filed alongside this card)
+  - CORE-PRIM — #1054 (`cloud_misconfiguration`, the card's first
+    playbook: primitives for all seven action steps, from none; one
+    fingerprint per rule and resource, the owner fallback recorded,
+    severity shifted by the operator's classification policy and never
+    lowered for an unknown resource, suppression only by a live, exact,
+    time-boxed ledger entry, recurrence keyed on rule and container as
+    the KRI defines it, every remediation attested, and verification
+    only by a fresh pass of the same rule under the same baseline).
   - CORE-PRIM part 1 — #1055 (`data_protection_impact_assessment`:
     primitives for the first five of its ten action steps, each rule
     checked against the GDPR and, where it leaves the method open,

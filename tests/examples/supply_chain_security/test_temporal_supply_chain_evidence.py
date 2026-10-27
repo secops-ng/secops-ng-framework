@@ -25,8 +25,9 @@ import importlib.util
 import json
 from pathlib import Path
 
+import pytest
+
 from compilers._shared.evidence import SupplyChainContext
-from compilers.temporal.evidence import emit_supply_chain_artifact_activity
 
 REPO = Path(__file__).resolve().parents[3]
 EXAMPLE = REPO / "examples" / "temporal" / "supply_chain_security"
@@ -80,6 +81,9 @@ def test_example_snapshot_matches_fixture() -> None:
 
 
 def test_example_snapshot_matches_temporal_activity(tmp_path: Path) -> None:
+    pytest.importorskip("temporalio")
+    from compilers.temporal.evidence import emit_supply_chain_artifact_activity
+
     ctx = _load_context()
     written_str = asyncio.run(
         emit_supply_chain_artifact_activity(ctx, tmp_path)
@@ -124,6 +128,9 @@ def test_temporal_adapter_artifact_id_is_deterministic(tmp_path: Path) -> None:
     same ``(workflow_id, execution_id, captured_at)`` triple ⇒ same
     ``artifact_id`` ⇒ identical bytes.
     """
+    pytest.importorskip("temporalio")
+    from compilers.temporal.evidence import emit_supply_chain_artifact_activity
+
     ctx = _load_context()
     first = Path(
         asyncio.run(emit_supply_chain_artifact_activity(ctx, tmp_path))

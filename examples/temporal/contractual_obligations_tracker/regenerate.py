@@ -50,9 +50,6 @@ from compilers._shared.evidence import (
     OwnerBlock,
     ReviewEntry,
 )
-from compilers.temporal.evidence import (
-    emit_contractual_obligations_artifact_activity,
-)
 
 HERE = Path(__file__).resolve().parent
 EVIDENCE_DIR = HERE / "evidence"
@@ -171,6 +168,12 @@ CTX = ContractualObligationsContext(
 
 
 def main() -> None:
+    # Imported here, not at module level, so tests can load the fixture
+    # data above without the Temporal runtime installed.
+    from compilers.temporal.evidence import (
+        emit_contractual_obligations_artifact_activity,
+    )
+
     EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
     written_str = asyncio.run(
         emit_contractual_obligations_artifact_activity(CTX, EVIDENCE_DIR)

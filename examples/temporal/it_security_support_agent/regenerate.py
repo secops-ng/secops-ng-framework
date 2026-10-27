@@ -43,9 +43,6 @@ import json
 import shutil
 from pathlib import Path
 
-from compilers.temporal.evidence import (
-    emit_interaction_evidence_artifact_activity,
-)
 from content.playbooks.it_security_support_agent.primitives import (
     attempt_automated_resolution,
     classify_request,
@@ -168,6 +165,12 @@ def _build_payload() -> dict:
 
 
 def main() -> None:
+    # Imported here, not at module level, so tests can load the fixture
+    # data above without the Temporal runtime installed.
+    from compilers.temporal.evidence import (
+        emit_interaction_evidence_artifact_activity,
+    )
+
     # Keep the mirrored CACAO source byte-identical to the canonical
     # playbook. The regenerate.sh driver also handles this but the
     # Python path stays self-contained for operators who run the .py

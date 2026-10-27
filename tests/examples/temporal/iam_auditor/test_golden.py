@@ -35,8 +35,9 @@ import json
 import re
 from pathlib import Path
 
+import pytest
+
 from compilers.temporal.emit import emit_file
-from compilers.temporal.evidence import emit_access_artifact_activity
 
 REPO = Path(__file__).resolve().parents[4]
 EXAMPLE = REPO / "examples" / "temporal" / "iam_auditor"
@@ -155,6 +156,9 @@ def test_activity_names_mirror_cacao_action_ids() -> None:
 
 
 def test_example_access_evidence_matches_temporal_adapter(tmp_path: Path) -> None:
+    pytest.importorskip("temporalio")
+    from compilers.temporal.evidence import emit_access_artifact_activity
+
     ctx = _load_ctx()
     written_str = asyncio.run(emit_access_artifact_activity(ctx, tmp_path))
     written = Path(written_str)
@@ -184,6 +188,9 @@ def test_example_access_evidence_carries_expected_anchors() -> None:
 
 
 def test_artifact_id_matches_path_stem(tmp_path: Path) -> None:
+    pytest.importorskip("temporalio")
+    from compilers.temporal.evidence import emit_access_artifact_activity
+
     ctx = _load_ctx()
     written_str = asyncio.run(emit_access_artifact_activity(ctx, tmp_path))
     written = Path(written_str)
