@@ -2437,7 +2437,7 @@ one playbook's provenance.
 
 ### F-WF-CORE-WAVE-2 — CORE wave 2: bind the remaining worthy playbooks; record the parked five
 
-- **Status:** Proposed
+- **Status:** In Progress
 - **Priority:** P3
 - **Goal:** G-01 (content coverage — completes the deployability story
   for the corpus: with wave 1 this card ends at every finalized
@@ -2473,6 +2473,14 @@ one playbook's provenance.
 - **Source:** #921; Director decision 2026-09-04.
 - **Shipped via:**
   - PARK notes — (docs PR, filed alongside this card)
+  - CORE-PRIM — #1054 (`cloud_misconfiguration`, the card's first
+    playbook: primitives for all seven action steps, from none; one
+    fingerprint per rule and resource, the owner fallback recorded,
+    severity shifted by the operator's classification policy and never
+    lowered for an unknown resource, suppression only by a live, exact,
+    time-boxed ledger entry, recurrence keyed on rule and container as
+    the KRI defines it, every remediation attested, and verification
+    only by a fresh pass of the same rule under the same baseline).
 
 ## Epic PT — Pattern Library
 
