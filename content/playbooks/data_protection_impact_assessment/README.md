@@ -16,12 +16,12 @@ lifecycle (GDPR Articles 15-22, owned by the sibling
 assessment lane that runs before the processing is bound to
 production.
 
-Status: **SKELETON**. Action steps are scaffolded as CACAO v2
-sources with `control_refs` / `telemetry_refs` stubs; the
-processing-inventory adapter, the risk-taxonomy binding, the DPO-
-consultation intake, the supervisory-authority pre-consultation
-submission chain, and the DPIA-document template are placeholders
-that a sibling CORE card lands.
+Status: **SKELETON**, with CORE-PRIM part 1 of 2 complete: the
+first five action steps have deterministic primitives (see
+*Primitives* below). The steps are not yet bound, so the compiled
+targets still carry the scaffold. The DPO-consultation intake, the
+supervisory-authority pre-consultation submission chain, and the
+DPIA-document template arrive with part 2 and the wire.
 
 ## Contents
 
@@ -36,6 +36,8 @@ that a sibling CORE card lands.
   anchors, the PM-9 / RA-3 / AU-9 OSCAL anchors called out in
   the task brief, and the D3-OAM D3FEND anchor on the
   identify_and_assess_risks step.
+- `primitives/` — deterministic primitives, one per action step;
+  the first five so far.
 
 ## Compile targets
 
@@ -79,6 +81,62 @@ are populated.
 10. **schedule_review_cadence** — pin the Article 35(11) review
     hook to the operator's change-management surface. Records
     `__review_cadence__`.
+
+## Primitives
+
+CORE-PRIM part 1 of 2. The first five action steps have a
+deterministic primitive under `primitives/`, executed directly by
+`tests/playbooks/data_protection_impact_assessment/test_primitives.py`.
+Every rule was checked against Regulation (EU) 2016/679 on EUR-Lex
+and, where the Regulation leaves the method open, against WP248
+rev.01.
+
+| Step | Primitive |
+|---|---|
+| screen_dpia_triggers | `screening.screen_dpia_triggers` |
+| classify_processing_type | `classification.classify_processing` |
+| gather_processing_description | `description.compose_processing_description` |
+| assess_necessity_and_proportionality | `necessity.assess_necessity_and_proportionality` |
+| identify_and_assess_risks | `risk.assess_risks` |
+
+Decisions the primitives fix:
+
+- **Screening runs in a fixed order.** The Art. 35(10) exemption,
+  then coverage by an existing assessment of similar processing
+  (Art. 35(1)), then the Art. 35(3) cases and the Art. 35(4) list,
+  then the Art. 35(5) list, then the WP248 rule that two of its nine
+  criteria make a DPIA required in most cases. A controller sets two
+  criteria aside only with a documented justification and, where a
+  DPO is designated, the DPO's views. The controller may always elect
+  a DPIA, and a negative screening is retained with its basis.
+- **The DPIA is the controller's.** A record held in the processor
+  role is refused under Art. 35(1).
+- **Lawfulness gaps are recorded.** No Art. 6(1) basis, special
+  categories without an Art. 9(2) condition, or criminal-offence data
+  without the Art. 10 authority are carried to the necessity
+  assessment.
+- **The description records what it still lacks.** An undescribed
+  legitimate interest where Art. 6(1)(f) is relied on, a data category
+  with no storage period or criteria, a third-country recipient
+  without a Chapter V basis, or no identified asset.
+- **Necessity fails on a sufficient alternative.** If a less intrusive
+  alternative would suffice, the processing is not necessary. Excess
+  data categories or an unsettled storage period make it not
+  proportionate. Lawfulness gaps and missing rights measures are owed.
+- **Risks are assessed whole, on the operator's calibration.** Each
+  risk names its sources, threats and impacts, with likelihood and
+  severity on the operator's scale; it is high when both reach the
+  operator's floor. Illegitimate access, undesired modification and
+  disappearance must each be covered, or the assessment is
+  incomplete.
+- **Every record's id covers its whole content.** Two records that
+  differ anywhere have different ids.
+
+**Owed: part 2 and the wire.** Part 2 covers the mitigations, the DPO
+consultation, the Art. 36 gate, the document and the review cadence.
+The wire then binds all ten steps, adds the gates the description
+promises (a negative screening ends the lifecycle), declares the
+adapter inputs and regenerates the three targets.
 
 ## Regulatory anchors
 

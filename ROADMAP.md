@@ -2481,6 +2481,15 @@ one playbook's provenance.
     time-boxed ledger entry, recurrence keyed on rule and container as
     the KRI defines it, every remediation attested, and verification
     only by a fresh pass of the same rule under the same baseline).
+  - CORE-PRIM part 1 — #1055 (`data_protection_impact_assessment`:
+    primitives for the first five of its ten action steps, each rule
+    checked against the GDPR and, where it leaves the method open,
+    WP248 rev.01; screening runs Art. 35(10), similar-assessment
+    coverage, Art. 35(3)-(5) and the two-criteria rule in that order,
+    the DPIA is the controller's, lawfulness gaps and description gaps
+    are recorded, a sufficient less intrusive alternative defeats
+    necessity, and every risk names its sources, threats and impacts
+    with all three reference events covered).
 
 ## Epic PT — Pattern Library
 
