@@ -17,37 +17,193 @@
               "name": "__finding_id__",
               "type": "string",
               "value": "",
-              "description": "Identifier of the originating CSPM / posture finding supplied by the detection layer."
+              "description": "Identifier of the originating CSPM / posture finding supplied by the detection layer. The ingest adapter fetches __posture_finding__ by it."
+            },
+            {
+              "name": "__posture_finding__",
+              "type": "object",
+              "value": "",
+              "description": "The posture finding the adapter fetched for __finding_id__, exactly finding_id, rule_ref (the baseline rule that fired), resource_ref, baseline_ref (the baseline version evaluated), misconfiguration_class (public_exposure, over_permissive_identity, network_exposure, missing_encryption or baseline_deviation), upstream_severity (informational, low, medium, high or critical), source (cspm_scan or iac_guardrail), first_observed_at (Zulu) and changed_at (the control-plane change that introduced the deviation, or null when unknown)."
+            },
+            {
+              "name": "__ingested_at__",
+              "type": "string",
+              "value": "",
+              "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the finding is ingested at."
+            },
+            {
+              "name": "__posture_case__",
+              "type": "object",
+              "value": "",
+              "description": "Envelope the ingest step emits: the normalised finding, its fingerprint (SHA-256 of rule and resource), and detection_latency_minutes when the introducing change is known."
+            },
+            {
+              "name": "__inventory_record__",
+              "type": "object",
+              "value": "",
+              "description": "The cloud-inventory record for the affected resource, exactly resource_ref, container_ref (the account, subscription, project or tenant), region, resource_type and classification; null, or empty from n8n, when the inventory has none, which the enrichment records as an inventory gap."
+            },
+            {
+              "name": "__ownership_record__",
+              "type": "object",
+              "value": "",
+              "description": "The ownership-graph record for the resource, exactly owner_ref and active (a real boolean); null, or empty from n8n, when the graph has none."
+            },
+            {
+              "name": "__default_owner_ref__",
+              "type": "string",
+              "value": "",
+              "description": "The operator's declared default ownership pool, which receives the case when the ownership graph has no active owner for the resource."
+            },
+            {
+              "name": "__severity_policy__",
+              "type": "object",
+              "value": "",
+              "description": "The operator's classification policy: each classification label mapped to a whole-number shift from -2 to +2 bands applied to the upstream severity."
+            },
+            {
+              "name": "__exception_ledger__",
+              "type": "string",
+              "value": "",
+              "description": "Exception-ledger entries, each exactly exception_ref, kind (time_boxed_exception, compensating_control or known_deviation), rule_ref, resource_ref, owner_ref, valid_from (Zulu), expires_at (Zulu, or null when open-ended) and attestation_ref (or null). CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it."
+            },
+            {
+              "name": "__prior_closures__",
+              "type": "string",
+              "value": "",
+              "description": "Earlier closed cases from the case ledger, each exactly case_ref, rule_ref, container_ref, outcome (verified, suppressed or escalated) and closed_at (Zulu). CACAO v2 has no list type, so the value rides as a string carrying a JSON-native list; the compile target's adapter seam marshals it."
+            },
+            {
+              "name": "__resolved_at__",
+              "type": "string",
+              "value": "",
+              "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the resource context is resolved at."
+            },
+            {
+              "name": "__resource_context__",
+              "type": "object",
+              "value": "",
+              "description": "Envelope the enrichment step emits: the resource and its container, the owner with any fallback, the upstream and resolved severity with the shift and its basis, known_false_positive as a real boolean with the matched and the rejected ledger entries, and the recurrence verdict."
             },
             {
               "name": "__resource_id__",
               "type": "string",
               "value": "",
-              "description": "Cloud resource identifier (URN / ARN / resource-id) the finding is bound to. Resolved during enrichment."
+              "description": "Cloud resource identifier (URN, ARN or path-style resource id) the finding is bound to. Extracted at the compile target's adapter seam from __resource_context__.resource_id."
             },
             {
               "name": "__owner_id__",
               "type": "string",
               "value": "",
-              "description": "Identity (team or individual) accountable for the resource per the operator's ownership graph. Drives owner notification."
+              "description": "Identity (team or individual) accountable for the resource, or the default pool when the ownership graph has no active owner. Extracted at the compile target's adapter seam from __resource_context__.owner_id."
             },
             {
               "name": "__severity__",
               "type": "string",
               "value": "",
-              "description": "Resolved severity of the finding after enrichment (informational, low, medium, high, critical). Drives SLA timers via the metrics layer."
+              "description": "Resolved severity of the finding (informational, low, medium, high or critical), which selects the notification channel. Extracted at the compile target's adapter seam from __resource_context__.severity."
             },
             {
               "name": "__known_false_positive__",
               "type": "boolean",
               "value": "",
-              "description": "True when the finding matches a documented exception or a known-benign baseline-deviation record within the suppression window. False routes into owner notification."
+              "description": "Whether a live, exact, time-boxed exception-ledger entry covers the finding; true routes to suppress-and-close, false to owner notification. Extracted at the compile target's adapter seam from __resource_context__.known_false_positive. A real boolean: the gate compares it to true, and the string 'false' is truthy in most runtimes."
+            },
+            {
+              "name": "__closed_at__",
+              "type": "string",
+              "value": "",
+              "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the suppressed case is closed at."
+            },
+            {
+              "name": "__suppression_closure__",
+              "type": "object",
+              "value": "",
+              "description": "Envelope the suppression step emits: the closure linked to the matched ledger entry and its expiry, with no remediation attempted and nobody paged."
+            },
+            {
+              "name": "__severity_routing__",
+              "type": "object",
+              "value": "",
+              "description": "The operator's pre-bound channel for each resolved severity: exactly informational, low, medium, high and critical, each the reference of a ticketing, chat or paging channel."
+            },
+            {
+              "name": "__runbook_ref__",
+              "type": "string",
+              "value": "",
+              "description": "The guided-remediation runbook for the violated baseline rule, carried on the owner notification."
+            },
+            {
+              "name": "__notified_at__",
+              "type": "string",
+              "value": "",
+              "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the owner is notified at."
+            },
+            {
+              "name": "__owner_notification__",
+              "type": "object",
+              "value": "",
+              "description": "Envelope the notification step emits: the owner and whether it is the default pool, the channel bound to the resolved severity, the finding, the resource, the violated baseline and the runbook."
+            },
+            {
+              "name": "__remediation_attempt__",
+              "type": "object",
+              "value": "",
+              "description": "The remediation attempt from the operator's change surface, exactly mode (iac_change, runbook_execution or manual_change), change_ref (the change record), approved_by (the operator's approver, required for an automated hand-off, or null), actor_ref and applied_at (Zulu)."
+            },
+            {
+              "name": "__remediation_recorded_at__",
+              "type": "string",
+              "value": "",
+              "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the remediation attempt is recorded at."
+            },
+            {
+              "name": "__remediation_record__",
+              "type": "object",
+              "value": "",
+              "description": "Envelope the guided-remediation step emits: the attested change (mode, change record, approver, actor and applied_at) and the NIST SP 800-53 anchors of its branch."
+            },
+            {
+              "name": "__rescan_result__",
+              "type": "object",
+              "value": "",
+              "description": "The targeted re-scan result, exactly rule_ref, resource_ref, baseline_ref, result (pass, fail or not_evaluated) and evaluated_at (Zulu)."
+            },
+            {
+              "name": "__verified_at__",
+              "type": "string",
+              "value": "",
+              "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the re-scan verdict is given at."
+            },
+            {
+              "name": "__rescan_verdict__",
+              "type": "object",
+              "value": "",
+              "description": "Envelope the re-scan step emits: the re-scan result, remediation_verified as a real boolean, the first failing reason when it is false, and the remediation latency when it is true."
             },
             {
               "name": "__remediation_verified__",
               "type": "boolean",
               "value": "",
-              "description": "Outcome of the post-remediation re-scan. True closes the case; false branches into escalation."
+              "description": "Whether the re-scan verified the remediation; true closes the case, false escalates. Extracted at the compile target's adapter seam from __rescan_verdict__.remediation_verified. A real boolean: the gate compares it to true."
+            },
+            {
+              "name": "__paging_channel_ref__",
+              "type": "string",
+              "value": "",
+              "description": "The security-engineering on-call's pre-bound paging channel."
+            },
+            {
+              "name": "__escalated_at__",
+              "type": "string",
+              "value": "",
+              "description": "Zulu instant (YYYY-MM-DDTHH:MM:SSZ) the escalation is raised at."
+            },
+            {
+              "name": "__escalation__",
+              "type": "object",
+              "value": "",
+              "description": "Envelope the escalation step emits: the finding, the attempted remediation, the failing re-scan evidence with its reason, and the recurrence verdict, for the security-engineering on-call."
             }
           ]
         }
@@ -58,117 +214,33 @@
     {
       "id": "action--30000000-0000-4000-8000-000000000002",
       "name": "ingest finding",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         500,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.finding_id",
-              "name": "in.finding_id",
-              "value": "={{$workflow.variables.finding_id}}",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.detection_refs",
-              "name": "x_secops_ng.detection_refs",
-              "value": "detection.sigma.cspm_finding_critical@v1, detection.sigma.public_storage_bucket@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.cspm_baseline@v1, control.incident_timeline_signals@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.compliance_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.mttd_cloud_misconfig@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.cloud_misconfiguration.primitives.finding import normalise_posture_finding\n__posture_case__ = normalise_posture_finding(finding=__posture_finding__, ingested_at=__ingested_at__)"
       },
-      "notes": "Fetch the CSPM / posture finding from the operator's posture-management platform: rule fingerprint, affected resource, evaluated baseline, first-observed timestamp. Source is identified by __finding_id__ and may originate from continuous CSPM scans or from an IaC policy guardrail emitting the same OCSF shape at deploy time.",
+      "notes": "Normalise the CSPM / posture finding the adapter fetched for __finding_id__ (__posture_finding__) into the case every later step reads. The finding may come from a continuous CSPM scan or from an IaC policy guardrail emitting the same shape at deploy time; the case fingerprint is the baseline rule and the resource, so both report the same deviation identically. Detection latency, and the MTTD stamp, are set only when the adapter names the control-plane change that introduced the deviation. Produces __posture_case__.",
       "notesInFlow": true
     },
     {
       "id": "action--30000000-0000-4000-8000-000000000003",
       "name": "enrich resource and owner",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         760,
         240
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.finding_id",
-              "name": "in.finding_id",
-              "value": "={{$workflow.variables.finding_id}}",
-              "type": "string"
-            },
-            {
-              "id": "out.resource_id",
-              "name": "out.resource_id",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "out.owner_id",
-              "name": "out.owner_id",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "out.severity",
-              "name": "out.severity",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "out.known_false_positive",
-              "name": "out.known_false_positive",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.cspm_baseline@v1, control.cloud_identity_least_privilege@v1, control.asset_inventory_delta@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.cloud_resources_inventory_info@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.cloud_posture_coverage@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.cloud_misconfiguration.primitives.context import resolve_resource_context\n__resource_context__ = resolve_resource_context(case=__posture_case__, inventory=__inventory_record__, ownership=__ownership_record__, default_owner_ref=__default_owner_ref__, severity_policy=__severity_policy__, exceptions=__exception_ledger__, prior_closures=__prior_closures__, resolved_at=__resolved_at__)"
       },
-      "notes": "Resolve the affected resource against the cloud inventory and ownership graph: tenant, project / account, region, resource type, tags, accountable owner, classification. Produces __resource_id__, __owner_id__, and __severity__ (severity is resolved here rather than ingested raw because the operator's classification can lift or lower the upstream CSPM severity). Also sets __known_false_positive__: true when the finding matches a documented exception or a known-benign baseline-deviation record within the suppression window, which the suppression branch reads.",
+      "notes": "Resolve the affected resource against the cloud inventory and the ownership graph. The owner is the graph's active owner, or the operator's default pool when there is none, with the fallback recorded. Severity is the upstream severity shifted by the operator's classification policy, never lowered for a resource the inventory does not know. The finding is a known false positive only when a live exception-ledger entry names this rule and this resource, carries an expiry and, for a compensating control, is attested; lapsed matches are listed with the reason. Recurrence is read from the prior closures as the recurring-misconfiguration KRI defines it. Produces __resource_context__, from which __resource_id__, __owner_id__, __severity__ and __known_false_positive__ are extracted.",
       "notesInFlow": true
     },
     {
@@ -202,197 +274,71 @@
         },
         "options": {}
       },
-      "notes": "Suppression branch on the boolean __known_false_positive__ set by the enrichment step. on_true: the finding matches a documented exception (compensating-control attestation, time-boxed exception record) or an already-seen baseline-deviation fingerprint within the suppression window; suppress-and-close. on_false: continue into owner notification.",
+      "notes": "Suppression branch on __known_false_positive__, extracted from __resource_context__. on_true: a live, exact, time-boxed exception-ledger entry covers the finding; suppress and close. on_false: continue into owner notification.",
       "notesInFlow": true
     },
     {
       "id": "action--30000000-0000-4000-8000-000000000005",
       "name": "suppress and close",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         1280,
         240
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.cspm_baseline@v1, control.control_effectiveness_test@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kri.recurring_cloud_misconfig@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.cloud_misconfiguration.primitives.suppression import compose_suppression_closure\n__suppression_closure__ = compose_suppression_closure(case=__posture_case__, context=__resource_context__, closed_at=__closed_at__)"
       },
-      "notes": "Link the finding to its existing exception or known-deviation record, close the case without paging, and account the suppression against the recurring-misconfiguration KRI so a chronically suppressed posture rule surfaces in the metrics layer.",
+      "notes": "Close the case on the ledger entry the enrichment matched, without a remediation attempt and without paging, and account the closure against the recurring-misconfiguration KRI so a chronically suppressed posture rule surfaces in the metrics layer. The step never extends or widens the entry, and refuses to close once the entry has lapsed. Produces __suppression_closure__.",
       "notesInFlow": true
     },
     {
       "id": "action--30000000-0000-4000-8000-000000000006",
       "name": "notify owner",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         1540,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.owner_id",
-              "name": "in.owner_id",
-              "value": "={{$workflow.variables.owner_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.resource_id",
-              "name": "in.resource_id",
-              "value": "={{$workflow.variables.resource_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.severity",
-              "name": "in.severity",
-              "value": "={{$workflow.variables.severity}}",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.incident_handling_capability@v1, control.oob_channel_probe@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.compliance_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.mttr_cloud_misconfig@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.cloud_misconfiguration.primitives.notification import compose_owner_notification\n__owner_notification__ = compose_owner_notification(case=__posture_case__, context=__resource_context__, routing=__severity_routing__, runbook_ref=__runbook_ref__, notified_at=__notified_at__)"
       },
-      "notes": "Notify the resource owner along the operator's pre-bound channel (ticketing / chat / paging, per __severity__). The notification carries the finding, the affected resource, the violated baseline, and a link to the guided-remediation runbook the next step references.",
+      "notes": "Notify the resource owner on the operator's pre-bound channel for the resolved severity; the routing binds one channel for each of the five severities. The notification carries the finding, the affected resource, the violated baseline and the guided-remediation runbook, and says so when the owner is the default pool. Produces __owner_notification__.",
       "notesInFlow": true
     },
     {
       "id": "action--30000000-0000-4000-8000-000000000007",
       "name": "guided remediation",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         1800,
         240
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.resource_id",
-              "name": "in.resource_id",
-              "value": "={{$workflow.variables.resource_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.owner_id",
-              "name": "in.owner_id",
-              "value": "={{$workflow.variables.owner_id}}",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.cspm_baseline@v1, control.iac_policy_guardrail@v1, control.cloud_identity_least_privilege@v1, control.patch_evidence@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.mttr_cloud_misconfig@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.cloud_misconfiguration.primitives.remediation import record_remediation_attempt\n__remediation_record__ = record_remediation_attempt(case=__posture_case__, notification=__owner_notification__, attempt=__remediation_attempt__, recorded_at=__remediation_recorded_at__)"
       },
-      "notes": "Apply the remediation bound to the violated baseline rule, with change-management attestation: either an operator-approved auto-remediation hand-off (IaC pull request, runbook execution) or an owner-driven manual change captured against the change record. The action body is operator-bound; only the contract (a remediation attempt is recorded against the finding) is fixed by this playbook.",
+      "notes": "Record the remediation attempt against the finding with change-management attestation. The change itself is operator-bound: an IaC change or runbook execution handed off with the operator's approver, or an owner-driven manual change. Every attempt cites its change record, and a change applied before the finding was first observed cannot be its remediation. Produces __remediation_record__, carrying the NIST SP 800-53 anchors of the branch.",
       "notesInFlow": true
     },
     {
       "id": "action--30000000-0000-4000-8000-000000000008",
       "name": "re-scan",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         2060,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.resource_id",
-              "name": "in.resource_id",
-              "value": "={{$workflow.variables.resource_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.finding_id",
-              "name": "in.finding_id",
-              "value": "={{$workflow.variables.finding_id}}",
-              "type": "string"
-            },
-            {
-              "id": "out.remediation_verified",
-              "name": "out.remediation_verified",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.detection_refs",
-              "name": "x_secops_ng.detection_refs",
-              "value": "detection.sigma.cspm_finding_critical@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.cspm_baseline@v1, control.control_effectiveness_test@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.compliance_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kpi.mttr_cloud_misconfig@v1, kpi.cloud_posture_coverage@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.cloud_misconfiguration.primitives.verification import verify_remediation\n__rescan_verdict__ = verify_remediation(case=__posture_case__, remediation=__remediation_record__, rescan=__rescan_result__, verified_at=__verified_at__)"
       },
-      "notes": "Trigger a targeted re-scan against the same baseline rule and resource. Emits __remediation_verified__ based on whether the rule still fires. The re-scan is a deterministic verification step, not a fresh posture sweep.",
+      "notes": "Read the targeted re-scan of the same baseline rule against the same resource; the re-scan is a deterministic verification, not a fresh posture sweep. The remediation is verified only by a pass, under the same baseline version, evaluated after the change; otherwise the verdict carries the first failing reason. Produces __rescan_verdict__, from which __remediation_verified__ is extracted.",
       "notesInFlow": true
     },
     {
@@ -426,62 +372,23 @@
         },
         "options": {}
       },
-      "notes": "Branch on __remediation_verified__. on_true: re-scan confirms the rule no longer fires; close the case. on_false: remediation did not stick \u2014 escalate so the recurring-misconfiguration KRI captures the residual exposure rather than closing on an unverified attempt.",
+      "notes": "Branch on __remediation_verified__, extracted from __rescan_verdict__. on_true: the rule no longer fires; close the case. on_false: the remediation did not stick, so escalate rather than close on an unverified attempt.",
       "notesInFlow": true
     },
     {
       "id": "action--30000000-0000-4000-8000-00000000000b",
       "name": "escalate",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         2580,
         420
       ],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "in.finding_id",
-              "name": "in.finding_id",
-              "value": "={{$workflow.variables.finding_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.resource_id",
-              "name": "in.resource_id",
-              "value": "={{$workflow.variables.resource_id}}",
-              "type": "string"
-            },
-            {
-              "id": "in.severity",
-              "name": "in.severity",
-              "value": "={{$workflow.variables.severity}}",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.control_refs",
-              "name": "x_secops_ng.control_refs",
-              "value": "control.recurring_incident_correlator@v1, control.incident_handling_capability@v1, control.incident_timeline_signals@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.telemetry_refs",
-              "name": "x_secops_ng.telemetry_refs",
-              "value": "telemetry.ocsf.compliance_finding@v1",
-              "type": "string"
-            },
-            {
-              "id": "x_secops_ng.metric_refs",
-              "name": "x_secops_ng.metric_refs",
-              "value": "kri.recurring_cloud_misconfig@v1",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "language": "python",
+        "pythonCode": "from content.playbooks.cloud_misconfiguration.primitives.escalation import compose_escalation\n__escalation__ = compose_escalation(case=__posture_case__, context=__resource_context__, remediation=__remediation_record__, verification=__rescan_verdict__, paging_channel_ref=__paging_channel_ref__, escalated_at=__escalated_at__)"
       },
-      "notes": "Escalate to the security-engineering on-call along the operator's pre-bound paging channel. The escalation payload carries the finding, the attempted remediation, and the failing re-scan evidence. Tracked against the recurring-misconfiguration KRI so chronic unremediated posture exceptions surface in the metrics layer.",
+      "notes": "Escalate to the security-engineering on-call on the operator's pre-bound paging channel. The payload carries the finding, the attempted remediation and the failing re-scan evidence with its reason, and repeats the recurrence verdict; the escalation is tracked against the recurring-misconfiguration KRI. Produces __escalation__.",
       "notesInFlow": true
     },
     {
@@ -504,11 +411,11 @@
       "typeVersion": 1,
       "position": [
         200,
-        -340
+        -494
       ],
       "parameters": {
-        "content": "## Cloud misconfiguration remediation\n`playbook.cloud_misconfiguration@v1` \u00b7 content v0.1.0 \u00b7 maturity: experimental \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nRespond to a cloud-posture (CSPM) finding that flags a sensitive misconfiguration: public storage exposure, over-permissive identity, missing encryption, or a deviating baseline. The playbook enriches the finding with resource ownership, notifies the responsible owner via the operator's pre-bound channel, guides the remediation through an attested change, and re-scans to verify the fix. Failed re-scans escalate so a recurring misconfiguration cannot quietly persist. CACAO v2\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(e) \u2014 security in network and information systems acquisition, development and maintenance, including vulnerability handling and disclosure\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(i) \u2014 human-resources security, access-control and asset-management policies\n- DORA Regulation (EU) 2022/2554, Article 9 \u2014 ICT risk-management framework (protection and prevention)\n- DORA Regulation (EU) 2022/2554, Article 19 \u2014 reporting of major ICT-related incidents (escalation path when a posture exception becomes incident-grade)\n\n**Controls:** 3 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__finding_id__`\n- Operator steps, emitted as Set nodes carrying the step's I/O contract; fill the values in n8n: ingest finding, enrich resource and owner, suppress and close, notify owner, guided remediation, re-scan, escalate\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/cloud_misconfiguration\nRegenerate with `python -m tools.compile content/playbooks/cloud_misconfiguration/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
-        "height": 520,
+        "content": "## Cloud misconfiguration remediation\n`playbook.cloud_misconfiguration@v1` \u00b7 content v1.0.0 \u00b7 maturity: stable \u00b7 compiled from a CACAO 2.0 playbook by SecOps-NG\n\nRespond to a cloud-posture (CSPM) finding that flags a sensitive misconfiguration: public storage exposure, over-permissive identity, missing encryption, or a deviating baseline. The playbook enriches the finding with resource ownership, notifies the responsible owner via the operator's pre-bound channel, guides the remediation through an attested change, and re-scans to verify the fix. Failed re-scans escalate so a recurring misconfiguration cannot quietly persist. CACAO v2\u2026\n\n**Regulatory anchors**\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(e) \u2014 security in network and information systems acquisition, development and maintenance, including vulnerability handling and disclosure\n- NIS2 Directive (EU) 2022/2555, Article 21(2)(i) \u2014 human-resources security, access-control and asset-management policies\n- DORA Regulation (EU) 2022/2554, Article 9 \u2014 ICT risk-management framework (protection and prevention)\n- DORA Regulation (EU) 2022/2554, Article 19 \u2014 reporting of major ICT-related incidents (escalation path when a posture exception becomes incident-grade)\n\n**Controls:** 3 control reference(s) in the canonical source, mapped under `content/mappings/`.\n\n**Before you run it**\n- Inputs the trigger expects from you: `__finding_id__`, `__posture_finding__`, `__ingested_at__`, `__inventory_record__`, `__ownership_record__`, `__default_owner_ref__`, `__severity_policy__`, `__exception_ledger__`, `__prior_closures__`, `__resolved_at__`, `__closed_at__`, `__severity_routing__`, `__runbook_ref__`, `__notified_at__`, `__remediation_attempt__`, `__remediation_recorded_at__`, `__rescan_result__`, `__verified_at__`, `__paging_channel_ref__`, `__escalated_at__`\n- Code nodes name the deterministic primitive each step runs; bind them to where your primitives execute, or replace the body:\n  - ingest finding \u2192 `content.playbooks.cloud_misconfiguration.primitives.finding.normalise_posture_finding`\n  - enrich resource and owner \u2192 `content.playbooks.cloud_misconfiguration.primitives.context.resolve_resource_context`\n  - suppress and close \u2192 `content.playbooks.cloud_misconfiguration.primitives.suppression.compose_suppression_closure`\n  - notify owner \u2192 `content.playbooks.cloud_misconfiguration.primitives.notification.compose_owner_notification`\n  - guided remediation \u2192 `content.playbooks.cloud_misconfiguration.primitives.remediation.record_remediation_attempt`\n  - re-scan \u2192 `content.playbooks.cloud_misconfiguration.primitives.verification.verify_remediation`\n  - escalate \u2192 `content.playbooks.cloud_misconfiguration.primitives.escalation.compose_escalation`\n- This file carries no credentials; connectors and secrets are yours to attach.\n\n**Source** https://github.com/secops-ng/secops-ng-framework/tree/main/content/playbooks/cloud_misconfiguration\nRegenerate with `python -m tools.compile content/playbooks/cloud_misconfiguration/playbook.cacao.json --target n8n`; do not hand-edit the compiled file. Apache-2.0.",
+        "height": 674,
         "width": 620,
         "color": 4
       }
@@ -650,7 +557,7 @@
       "name": "secops-ng"
     },
     {
-      "name": "maturity:experimental"
+      "name": "maturity:stable"
     },
     {
       "name": "regime:nis2"
@@ -681,18 +588,10 @@
   "meta": {
     "secops_ng": {
       "stable_id": "playbook.cloud_misconfiguration@v1",
-      "content_version": "0.1.0",
-      "maturity": "experimental",
+      "content_version": "1.0.0",
+      "maturity": "stable",
       "source_playbook_id": "playbook--30a0b0c0-d0e0-4f00-8a1b-c2d3e4f5a6b8"
     },
-    "secops_ng_notes": [
-      "step 'action--30000000-0000-4000-8000-000000000002': manual action \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator performs the step and fills the values in n8n.",
-      "step 'action--30000000-0000-4000-8000-000000000003': manual action \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator performs the step and fills the values in n8n.",
-      "step 'action--30000000-0000-4000-8000-000000000005': manual action \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator performs the step and fills the values in n8n.",
-      "step 'action--30000000-0000-4000-8000-000000000006': manual action \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator performs the step and fills the values in n8n.",
-      "step 'action--30000000-0000-4000-8000-000000000007': manual action \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator performs the step and fills the values in n8n.",
-      "step 'action--30000000-0000-4000-8000-000000000008': manual action \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator performs the step and fills the values in n8n.",
-      "step 'action--30000000-0000-4000-8000-00000000000b': manual action \u2014 emitted Set node carrying the CACAO I/O contract (in_args / out_args / x_secops_ng refs). Operator performs the step and fills the values in n8n."
-    ]
+    "secops_ng_notes": []
   }
 }

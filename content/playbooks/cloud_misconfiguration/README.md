@@ -40,9 +40,14 @@ This directory ships the portable content only.
 
 ## Status
 
-`maturity: experimental`, CORE-PRIM complete. Each of the seven action
-steps has a deterministic primitive under `primitives/`, executed
-directly by `tests/playbooks/cloud_misconfiguration/test_primitives.py`.
+`maturity: stable`, `content_version` 1.0.0. All seven action steps
+bind a deterministic primitive under `primitives/` through `core_body`,
+each executed directly by
+`tests/playbooks/cloud_misconfiguration/test_primitives.py`, and the
+three reference targets emit those calls. The graduation checklist
+recomputes green: tier A, 7 of 7 real bindings, zero placeholder
+bodies, zero blank predicates, zero schema errors, zero predicted n8n
+TODOs.
 
 | Step | Primitive |
 |---|---|
@@ -92,12 +97,19 @@ Decisions the primitives fix:
   carries the attempted change and the failing evidence for the
   security-engineering on-call.
 
-**Owed: the wire.** The CACAO steps do not yet carry `core_body`, so
-`catalog.py` reports 0 of 7 bound. The CORE-WIRE stage binds them,
-declares the adapter inputs (the finding, the inventory and ownership
-records, the severity policy, the exception ledger, the prior closures,
-the routing table, the runbook, the remediation attempt, the re-scan
-result and the paging channel), and regenerates the three targets.
+- **The contract grows from 6 to 32 variables.** There are 19 adapter
+  inputs: the finding, the inventory and ownership records, the default
+  pool, the severity policy, the exception ledger, the prior closures,
+  the routing table, the runbook, the remediation attempt, the re-scan
+  result, the paging channel and the step instants. The ledger and the
+  prior closures ride as JSON strings, because CACAO has no list type.
+  There is one envelope per step. The five existing names are now
+  fields extracted from those envelopes at the adapter seam, and
+  `__finding_id__` stays the trigger input.
+- **Both gates read real booleans.** `__known_false_positive__` comes
+  from the enrichment envelope and `__remediation_verified__` from the
+  re-scan envelope. Each gate compares its boolean to true, so the
+  string `false`, which is truthy in most runtimes, never reaches it.
 
 ## Regulatory cross-references
 
