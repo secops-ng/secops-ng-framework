@@ -7,10 +7,11 @@ by the EDPB).
 
 from __future__ import annotations
 
+import calendar
 import hashlib
 import json
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 ZULU = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 POINTER = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.:/@-]{0,255}$")
@@ -128,6 +129,25 @@ def content_id(name: str, body: dict) -> dict:
     """
     canonical = json.dumps(body, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
     return {name: digest(name, canonical), **body}
+
+
+def add_months(when: datetime, months: int) -> datetime:
+    """Calendar months, clamped to the last day of a shorter month (31 Jan + 1 month = 28 or 29 Feb)."""
+    month = when.month - 1 + months
+    year, month = when.year + month // 12, month % 12 + 1
+    last = calendar.monthrange(year, month)[1]
+    return when.replace(year=year, month=month, day=min(when.day, last))
+
+
+def add_duration(when: datetime, duration: str) -> datetime:
+    """Add an ISO 8601 date duration (``PnYnMnWnD``): calendar years and months, then weeks and days."""
+    m = DURATION.match(duration)
+    years, months, weeks, days = (int(g[:-1]) if g else 0 for g in m.groups())
+    return add_months(when, 12 * years + months) + timedelta(weeks=weeks, days=days)
+
+
+def instant(when: datetime) -> str:
+    return when.strftime(FMT)
 
 
 def record(value: object, keys: set, name: str, case_id: str, error: type[ValueError]) -> dict:

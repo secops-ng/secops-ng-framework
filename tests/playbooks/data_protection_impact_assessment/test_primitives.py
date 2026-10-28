@@ -7,18 +7,29 @@ import yaml
 
 from compilers._shared.cacao_parser import secops_extension
 from content.playbooks.data_protection_impact_assessment.primitives import (
+    CHANGE_TRIGGERS,
     RISK_EVENTS,
     SPECIAL_CATEGORIES,
     WP248_CRITERIA,
+    InvalidConsultationError,
+    InvalidDpiaDocumentError,
+    InvalidMitigationsError,
     InvalidNecessityAssessmentError,
+    InvalidPriorConsultationError,
     InvalidProcessingClassificationError,
     InvalidProcessingDescriptionError,
+    InvalidReviewScheduleError,
     InvalidRiskAssessmentError,
     InvalidScreeningError,
     assess_necessity_and_proportionality,
     assess_risks,
     classify_processing,
+    compose_dpia_document,
     compose_processing_description,
+    determine_prior_consultation,
+    document_mitigations,
+    record_dpo_consultation,
+    schedule_review,
     screen_dpia_triggers,
 )
 
@@ -388,19 +399,248 @@ def test_records_that_differ_in_any_field_have_different_ids() -> None:
 # --------------------------------------------------------------------------- catalogue contract
 
 
-def test_the_five_primitives_back_the_first_five_steps_and_stamp_no_undeclared_metric() -> None:
+def test_the_ten_primitives_back_the_ten_steps_and_stamp_no_undeclared_metric() -> None:
     doc = yaml.safe_load(PLAYBOOK.read_text(encoding="utf-8"))
     declared = set(secops_extension(doc).get("metric_refs") or [])
     names = [s["name"] for s in doc["workflow"].values() if s["type"] == "action"]
-    assert names[:5] == ["screen_dpia_triggers", "classify_processing_type", "gather_processing_description",
-                         "assess_necessity_and_proportionality", "identify_and_assess_risks"]
-    c = classify()
-    d = describe(c)
-    n = assess(c, d)
-    for out in (required(), c, d, n, risks(n=n)):
+    assert names == ["screen_dpia_triggers", "classify_processing_type", "gather_processing_description",
+                     "assess_necessity_and_proportionality", "identify_and_assess_risks",
+                     "identify_and_document_mitigations", "dpo_consultation", "determine_article_36_gate",
+                     "produce_dpia_document", "schedule_review_cadence"]
+    chain = full_chain()
+    for out in (*chain, schedule(chain[-1])):
         assert set(out["metric_stamps"]) <= declared
 
 
 def test_the_vocabularies_follow_the_regulation_and_wp248() -> None:
     assert len(SPECIAL_CATEGORIES) == 8 and len(WP248_CRITERIA) == 9
     assert RISK_EVENTS == ("illegitimate_access", "undesired_modification", "disappearance")
+
+
+# =========================================================================== CORE-PRIM part 2
+
+HIGH_ACCESS = {"illegitimate_access": ("significant", "maximum")}
+ENCRYPT = {"measure_ref": "m:encrypt-at-rest", "kind": "security_measure", "addresses": ["risk:illegitimate_access"],
+           "control_refs": ["control.encryption_at_rest@v1"]}
+
+
+def residual_as_assessed(r) -> list:
+    return [{"risk_ref": x["risk_ref"], "likelihood": x["likelihood"], "severity": x["severity"]} for x in r["risks"]]
+
+
+def lowered(r, ref="risk:illegitimate_access", to=("limited", "maximum")) -> list:
+    return [{**x, "likelihood": to[0], "severity": to[1]} if x["risk_ref"] == ref else x for x in residual_as_assessed(r)]
+
+
+def mitigate(r=None, measures=None, residual=None) -> dict:
+    r = r or risks(all_events(**HIGH_ACCESS))
+    return document_mitigations(r, [ENCRYPT] if measures is None else measures,
+                                lowered(r) if residual is None else residual, "2026-10-26T09:50:00Z")
+
+
+VIEWS = {"sought": True, "views_ref": "survey:staff-council-1", "decision_differs": False,
+         "decision_reasons_ref": None, "not_sought_justification_ref": None}
+
+
+def consult_input(**over) -> dict:
+    c = {"dpo_designated": True, "dpo_ref": "person:dpo", "advice_ref": "advice:dpo-1", "advice_followed": True,
+         "departure_reasons_ref": None, "alternative_accountability_ref": None, "data_subject_views": dict(VIEWS)}
+    return {**c, **over}
+
+
+def consult(m=None, **over) -> dict:
+    return record_dpo_consultation(m or mitigate(), consult_input(**over), "2026-10-26T10:00:00Z")
+
+
+def determine(m=None, member_state=False, submission=None) -> dict:
+    return determine_prior_consultation(m or mitigate(), member_state, submission, "2026-10-26T10:10:00Z")
+
+
+def full_chain(rs=None, residual=None, alternatives=(), consultation=None, member_state=False) -> tuple:
+    s = required()
+    c = classify(s)
+    d = describe(c)
+    n = assess(c, d, alternatives=list(alternatives))
+    r = risks(all_events(**HIGH_ACCESS) if rs is None else rs, n=n)
+    m = mitigate(r, residual=residual)
+    k = consult(m, **(consultation or {}))
+    g = determine(m, member_state)
+    doc = compose_dpia_document(s, c, d, n, r, m, k, g, "wf:dpia", "exec:1", "2026-10-26T10:20:00Z")
+    return s, c, d, n, r, m, k, g, doc
+
+
+def schedule(doc, interval="P1Y", triggers=("purpose",), at="2026-10-26T10:30:00Z") -> dict:
+    return schedule_review(doc, interval, list(triggers), "change:board", at)
+
+
+# --------------------------------------------------------------------------- identify_and_document_mitigations
+
+
+def test_a_measure_lowers_the_residual_risk_below_the_high_floor() -> None:
+    m = mitigate()
+    assert m["residual_high_risks"] == [] and m["untreated_risks"] == ["risk:disappearance",
+                                                                       "risk:undesired_modification"]
+    assert m["gaps"] == [] and m["complete"] is True
+    assert next(x for x in m["residual_risks"] if x["risk_ref"] == "risk:illegitimate_access")["high"] is False
+
+
+def test_an_untreated_high_risk_is_a_gap_and_stays_high() -> None:
+    r = risks(all_events(**HIGH_ACCESS))
+    m = mitigate(r, measures=[], residual=residual_as_assessed(r))
+    assert m["gaps"] == ["untreated_high_risk:risk:illegitimate_access"]
+    assert m["residual_high_risks"] == ["risk:illegitimate_access"]
+
+
+@pytest.mark.parametrize("residual_of", [
+    lambda r: lowered(r, to=("maximum", "maximum")),
+    lambda r: lowered(r, ref="risk:disappearance", to=("negligible", "negligible")),
+    lambda r: residual_as_assessed(r)[1:],
+    lambda r: residual_as_assessed(r) + [residual_as_assessed(r)[0]],
+])
+def test_an_inconsistent_residual_level_is_refused(residual_of) -> None:
+    r = risks(all_events(**HIGH_ACCESS))
+    with pytest.raises(InvalidMitigationsError):
+        mitigate(r, residual=residual_of(r))
+
+
+def test_a_measure_for_an_unassessed_risk_is_refused() -> None:
+    with pytest.raises(InvalidMitigationsError, match="does not list"):
+        mitigate(measures=[{**ENCRYPT, "addresses": ["risk:unknown"]}])
+
+
+def test_an_incomplete_risk_assessment_carries_over_as_a_gap() -> None:
+    r = risks([risk("risk:illegitimate_access", "illegitimate_access")])
+    assert mitigate(r, measures=[], residual=residual_as_assessed(r))["gaps"] == ["risk_assessment_incomplete"]
+
+
+# --------------------------------------------------------------------------- dpo_consultation
+
+
+def test_followed_dpo_advice_and_recorded_views_are_complete() -> None:
+    k = consult()
+    assert k["complete"] is True and k["advice_followed"] is True and k["data_subject_views"]["sought"] is True
+
+
+@pytest.mark.parametrize(("over", "gap"), [
+    ({"advice_followed": False}, "departure_from_dpo_advice_undocumented"),
+    ({"advice_ref": None, "advice_followed": None}, "dpo_advice_missing"),
+    ({"dpo_designated": False, "dpo_ref": None, "advice_ref": None, "advice_followed": None},
+     "no_dpo_and_no_alternative_accountability"),
+    ({"data_subject_views": {**VIEWS, "views_ref": None}}, "data_subject_views_unrecorded"),
+    ({"data_subject_views": {**VIEWS, "decision_differs": True}}, "departure_from_data_subject_views_undocumented"),
+    ({"data_subject_views": {**VIEWS, "sought": False, "views_ref": None}}, "not_seeking_views_unjustified"),
+])
+def test_undocumented_departures_and_missing_advice_are_gaps(over, gap) -> None:
+    assert consult(**over)["gaps"] == [gap]
+
+
+def test_documented_departures_and_alternatives_close_the_gaps() -> None:
+    assert consult(advice_followed=False, departure_reasons_ref="memo:why-not")["complete"] is True
+    assert consult(dpo_designated=False, dpo_ref=None, advice_ref=None, advice_followed=None,
+                   alternative_accountability_ref="role:privacy-lead")["complete"] is True
+    views = {**VIEWS, "sought": False, "views_ref": None, "not_sought_justification_ref": "memo:impracticable"}
+    assert consult(data_subject_views=views)["complete"] is True
+
+
+@pytest.mark.parametrize("over", [
+    {"dpo_designated": False, "dpo_ref": None, "advice_ref": "advice:x", "advice_followed": None,
+     "alternative_accountability_ref": "role:x"},
+    {"advice_followed": None},
+    {"advice_followed": "yes"},
+])
+def test_a_self_contradictory_consultation_is_refused(over) -> None:
+    with pytest.raises(InvalidConsultationError):
+        consult(**over)
+
+
+# --------------------------------------------------------------------------- determine_article_36_gate
+
+
+def test_a_residual_high_risk_requires_prior_consultation() -> None:
+    r = risks(all_events(**HIGH_ACCESS))
+    g = determine(mitigate(r, measures=[], residual=residual_as_assessed(r)))
+    assert g["article_36_pre_consultation_flag"] is True and g["basis"] == ["residual_high_risk"]
+
+
+def test_risks_mitigated_below_high_need_no_consultation_unless_member_state_law_says_so() -> None:
+    assert determine()["article_36_pre_consultation_flag"] is False
+    g = determine(member_state=True)
+    assert g["article_36_pre_consultation_flag"] is True and g["basis"] == ["art_36_5_member_state_law"]
+
+
+@pytest.mark.parametrize(("received", "extended", "due", "notice"), [
+    ("2026-11-02T10:00:00Z", False, "2026-12-28T10:00:00Z", "2026-12-02T10:00:00Z"),
+    ("2026-11-02T10:00:00Z", True, "2027-02-08T10:00:00Z", "2026-12-02T10:00:00Z"),
+    ("2027-01-31T09:00:00Z", False, "2027-03-28T09:00:00Z", "2027-02-28T09:00:00Z"),
+])
+def test_the_article_36_2_windows_run_from_receipt(received, extended, due, notice) -> None:
+    g = determine(member_state=True, submission={"received_at": received, "extended": extended})
+    w = g["consultation_windows"]
+    assert (w["advice_due_by"], w["extension_notice_due_by"]) == (due, notice)
+
+
+def test_a_consultation_request_without_a_flag_is_refused() -> None:
+    with pytest.raises(InvalidPriorConsultationError):
+        determine(submission={"received_at": "2026-11-02T10:00:00Z", "extended": False})
+
+
+# --------------------------------------------------------------------------- produce_dpia_document
+
+
+def test_a_complete_chain_produces_a_final_document_that_may_proceed() -> None:
+    doc = full_chain()[-1]
+    assert doc["final"] is True and doc["open_items"] == [] and doc["conclusion"] == "may_proceed"
+
+
+def test_a_residual_high_risk_concludes_prior_consultation_required() -> None:
+    s, c, d, n, r, _, _, _, _ = full_chain()
+    m = mitigate(r, measures=[ENCRYPT], residual=lowered(r, to=("significant", "significant")))
+    k, g = consult(m), determine(m)
+    doc = compose_dpia_document(s, c, d, n, r, m, k, g, "wf:dpia", "exec:1", "2026-10-26T10:20:00Z")
+    assert doc["conclusion"] == "prior_consultation_required" and doc["article_36_pre_consultation_flag"] is True
+
+
+def test_an_unnecessary_processing_concludes_do_not_proceed() -> None:
+    alt = {"alternative_ref": "alt:aggregate-only", "suffices": True, "reasoning_ref": "memo:a"}
+    assert full_chain(alternatives=[alt])[-1]["conclusion"] == "do_not_proceed"
+
+
+def test_open_items_keep_the_document_a_draft() -> None:
+    doc = full_chain(consultation={"advice_followed": False})[-1]
+    assert doc["final"] is False and doc["open_items"] == ["consultation:departure_from_dpo_advice_undocumented"]
+
+
+def test_records_from_another_chain_are_refused() -> None:
+    s, c, d, n, r, m, k, g, _ = full_chain()
+    other_m = mitigate(r, measures=[], residual=residual_as_assessed(r))
+    assert other_m["mitigations_ref"] != m["mitigations_ref"]
+    with pytest.raises(InvalidDpiaDocumentError, match="different predecessor"):
+        compose_dpia_document(s, c, d, n, r, m, consult(other_m), g, "wf:dpia", "exec:1", "2026-10-26T10:20:00Z")
+
+
+# --------------------------------------------------------------------------- schedule_review_cadence
+
+
+def test_a_change_of_risk_always_triggers_a_review_within_the_interval() -> None:
+    v = schedule(full_chain()[-1])
+    assert v["change_triggers"] == ["change_of_risk", "purpose"]
+    assert (v["review_cadence"], v["next_review_due"], v["document_final"]) == ("P1Y", "2027-10-26T10:30:00Z", True)
+
+
+def test_the_next_review_clamps_to_the_end_of_a_shorter_month() -> None:
+    assert schedule(full_chain()[-1], at="2028-02-29T00:00:00Z")["next_review_due"] == "2029-02-28T00:00:00Z"
+    assert schedule(full_chain()[-1], interval="P1M2W")["next_review_due"] == "2026-12-10T10:30:00Z"
+
+
+def test_a_draft_document_is_scheduled_and_says_so() -> None:
+    assert schedule(full_chain(consultation={"advice_followed": False})[-1])["document_final"] is False
+
+
+@pytest.mark.parametrize(("interval", "triggers"), [("1Y", ()), ("PT12H", ()), ("P1Y", ("weather",))])
+def test_a_malformed_schedule_is_refused(interval, triggers) -> None:
+    with pytest.raises(InvalidReviewScheduleError):
+        schedule(full_chain()[-1], interval=interval, triggers=triggers)
+
+
+def test_the_change_triggers_include_the_article_35_11_minimum() -> None:
+    assert CHANGE_TRIGGERS[0] == "change_of_risk"
