@@ -137,6 +137,14 @@ def test_emit_is_deterministic() -> None:
 
 
 def _action_without_commands_steps() -> dict[str, dict]:
+    """Unbound action steps: no commands, or only ``manual`` ones.
+
+    Since the CORE-WIRE change all seven action steps are bound, so this
+    returns ``{}`` and the Set-node tests that consume it are vacuous here.
+    They are kept as the contract that catches a step being unbound again.
+    The live check for the bound steps is ``test_core_body_steps_emit_code_nodes``
+    in ``tests/examples/n8n/cloud_misconfiguration/test_golden.py``.
+    """
     raw = json.loads(SOURCE.read_text(encoding="utf-8"))
     return {
         step_id: step
