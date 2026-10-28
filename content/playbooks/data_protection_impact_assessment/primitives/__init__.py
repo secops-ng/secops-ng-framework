@@ -6,7 +6,6 @@ step of the GDPR Art. 35 assessment. Every rule was checked against
 Regulation (EU) 2016/679 on EUR-Lex and, where the Regulation leaves the
 method open, against the WP248 rev.01 guidelines the EDPB endorsed.
 
-The first five steps (CORE-PRIM part 1):
 
 * :mod:`.screening` — :func:`screen_dpia_triggers` (screen_dpia_triggers).
   Art. 35(10), similar-assessment coverage, Art. 35(3), the Art. 35(4) and
@@ -26,8 +25,24 @@ The first five steps (CORE-PRIM part 1):
   Art. 35(7)(c): sources, threats, impacts, likelihood and severity per
   risk, all three reference events covered, on the operator's calibration.
 
-The remaining five (mitigations, DPO consultation, the Art. 36 gate, the
-document and the review cadence) are part 2. Pure, offline and LLM-free:
+* :mod:`.mitigations` — :func:`document_mitigations`
+  (identify_and_document_mitigations). Art. 35(7)(d): measures against the
+  assessed risks, and the residual level of each, never above the assessed
+  one; an untreated high risk is a gap.
+* :mod:`.consultation` — :func:`record_dpo_consultation` (dpo_consultation).
+  Art. 35(2) DPO advice, or the alternative accountability surface, and the
+  Art. 35(9) views of data subjects, with documented departures.
+* :mod:`.prior_consultation` — :func:`determine_prior_consultation`
+  (determine_article_36_gate). Art. 36(1) on the residual risk, Art. 36(5)
+  Member State law, and the Art. 36(2) windows once the request is received.
+* :mod:`.document` — :func:`compose_dpia_document` (produce_dpia_document).
+  The nine records of one case joined into one document, final only with
+  nothing left open, and its conclusion.
+* :mod:`.review` — :func:`schedule_review` (schedule_review_cadence).
+  Art. 35(11): a change of risk always triggers a review, within the
+  operator's maximum interval.
+
+Pure, offline and LLM-free:
 JSON-native inputs and outputs, no datetime objects on the boundary. The
 Art. 30 record, the supervisory-authority lists, the risk taxonomy and the
 evidence store stay adapter-bound operator surfaces.
@@ -37,6 +52,7 @@ from __future__ import annotations
 
 from ._common import ART_35_3, RISK_EVENTS, SPECIAL_CATEGORIES, VULNERABLE_SUBJECTS, WP248_CRITERIA
 from .classification import ROLES, InvalidProcessingClassificationError, classify_processing
+from .consultation import InvalidConsultationError, record_dpo_consultation
 from .description import (
     ASSET_KINDS,
     RECIPIENT_ROLES,
@@ -44,7 +60,11 @@ from .description import (
     InvalidProcessingDescriptionError,
     compose_processing_description,
 )
+from .document import CONCLUSIONS, InvalidDpiaDocumentError, compose_dpia_document
+from .mitigations import MEASURE_KINDS, InvalidMitigationsError, document_mitigations
 from .necessity import OUTCOMES, RIGHTS_MEASURES, InvalidNecessityAssessmentError, assess_necessity_and_proportionality
+from .prior_consultation import InvalidPriorConsultationError, determine_prior_consultation
+from .review import CHANGE_TRIGGERS, InvalidReviewScheduleError, schedule_review
 from .risk import InvalidRiskAssessmentError, assess_risks
 from .screening import BASES, InvalidScreeningError, screen_dpia_triggers
 
@@ -52,6 +72,9 @@ __all__ = [
     "ART_35_3",
     "ASSET_KINDS",
     "BASES",
+    "CHANGE_TRIGGERS",
+    "CONCLUSIONS",
+    "MEASURE_KINDS",
     "OUTCOMES",
     "RECIPIENT_ROLES",
     "RIGHTS_MEASURES",
@@ -61,14 +84,24 @@ __all__ = [
     "TRANSFER_MECHANISMS",
     "VULNERABLE_SUBJECTS",
     "WP248_CRITERIA",
+    "InvalidConsultationError",
+    "InvalidDpiaDocumentError",
+    "InvalidMitigationsError",
     "InvalidNecessityAssessmentError",
+    "InvalidPriorConsultationError",
     "InvalidProcessingClassificationError",
     "InvalidProcessingDescriptionError",
+    "InvalidReviewScheduleError",
     "InvalidRiskAssessmentError",
     "InvalidScreeningError",
     "assess_necessity_and_proportionality",
     "assess_risks",
     "classify_processing",
+    "compose_dpia_document",
     "compose_processing_description",
+    "determine_prior_consultation",
+    "document_mitigations",
+    "record_dpo_consultation",
+    "schedule_review",
     "screen_dpia_triggers",
 ]
