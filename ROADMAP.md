@@ -2490,6 +2490,13 @@ one playbook's provenance.
     are recorded, a sufficient less intrusive alternative defeats
     necessity, and every risk names its sources, threats and impacts
     with all three reference events covered).
+  - CORE-PRIM part 2 — #1060, closing #1058 (`data_protection_impact_assessment`:
+    primitives for the last five steps, completing all ten; every risk
+    gets a residual level never above its assessed one, departures from
+    the DPO's advice or the data subjects' views are documented, the
+    Art. 36(1) gate reads the residual risk as WP248 III.E does and
+    records the Art. 36(2) windows, the document is final only with
+    nothing open, and a change of risk always triggers a review).
 
 ## Epic PT — Pattern Library
 
