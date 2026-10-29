@@ -13,6 +13,7 @@ Intelligence Inference event class → propagate the result to detection
 - `mappings.yaml` — regulatory/metrics overlay (real OSCAL / D3FEND /
   OCSF IDs plus NIS2 Art. 21(2)(d) and DORA Art. 19(2) cross-refs).
   Schema: `../../../schemas/playbook-mappings.schema.json`.
+- `primitives/` — one deterministic primitive per action step (see Status).
 
 ## Mappings
 
@@ -116,6 +117,59 @@ rule ID list below.
 artifacts under `examples/{n8n,temporal,langgraph}/threat_intel_ingest/`
 will be authored by the CORE card; this directory ships the portable
 content only.
+
+## Status
+
+`maturity: experimental`, CORE-PRIM complete. Each of the four action
+steps has a deterministic primitive under `primitives/`, executed
+directly by `tests/playbooks/threat_intel_ingest/test_primitives.py`.
+One scheduled poll of one feed is one batch.
+
+| Step | Primitive |
+|---|---|
+| pull upstream feed | `feed.capture_feed_batch` |
+| normalise STIX to OCSF | `normalisation.normalise_indicators` |
+| propagate to blocklist | `blocklist.record_blocklist_propagation` |
+| activate detection rule | `detection.record_detection_activation` |
+
+Decisions the primitives fix:
+
+- **A whole capture or none.** The feed URL is `https` (the TAXII 2.1
+  transport) and carries no credentials. Every TAXII envelope of the
+  poll is read until one no longer says `more`; a capture that stops
+  early is refused rather than passed off as a complete batch.
+- **The current, valid version of each Indicator.** The most recent
+  `modified` is the object's state (STIX 2.1 section 3.6); two different
+  objects sharing it are excluded as conflicting. Revoked, expired and
+  not-yet-valid indicators are excluded, and so is a malformed one,
+  without failing the rest of the batch. Every exclusion is recorded.
+- **Only an exact value is blocked.** A single equality on an IP
+  address, an `ISSUBSET` on a range, an equality on a domain or on a
+  fixed-length file hash names something an enforcement point can hold.
+  Compound patterns, fuzzy hashes and other pattern languages are armed
+  for detection only.
+- **Blocking needs a stated confidence at or above the threshold.** An
+  absent STIX `confidence` is unspecified, so it never blocks.
+- **Never a protected or non-global value.** An address range whose
+  first or last address is not globally routable, a single-label
+  domain, and anything overlapping the operator's never-block list are
+  armed for detection only, whatever their confidence. Each held-back
+  record says why.
+- **Deduplication never swallows an escalation.** One record per value
+  in a batch, the strongest kept; a value normalised within the last 24
+  hours is not repeated unless it now qualifies for blocking and did
+  not before.
+- **Every lane, or not propagated.** An IP is denied inbound and
+  outbound at the perimeter, a domain sinkholed, a file hash put on the
+  EDR blocklist. The MTTR KPI is stamped only when every blocked
+  indicator is accepted on every lane its kind needs.
+- **Every indicator armed, or a gap.** The rule pack selects the rules
+  the batch's kinds call for; each needs a receipt. The MTTD anchor is
+  each armed indicator's STIX `created` time, and the KPI is stamped
+  when an indicator at or above the threshold is armed.
+
+Owed: the wire. The four steps are not yet bound through `core_body`,
+and the playbook stays `experimental` until they are.
 
 ## Sigma rule references (upstream — SigmaHQ)
 

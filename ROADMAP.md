@@ -2490,6 +2490,15 @@ one playbook's provenance.
     are recorded, a sufficient less intrusive alternative defeats
     necessity, and every risk names its sources, threats and impacts
     with all three reference events covered).
+  - CORE-PRIM — #1061 (`threat_intel_ingest`: primitives for all four
+    action steps, from none; a capture is read to the last TAXII
+    envelope or refused, only the current, unrevoked, valid version of
+    each STIX Indicator counts, only an exact value with a stated
+    confidence at or above the threshold is blocked and never a
+    protected or non-global one, deduplication never swallows an
+    escalation to blocking, propagation counts only when every lane the
+    kind needs accepted it, and every indicator is armed or recorded as
+    a gap).
 
 ## Epic PT — Pattern Library
 
