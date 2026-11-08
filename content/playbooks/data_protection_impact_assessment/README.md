@@ -16,12 +16,10 @@ lifecycle (GDPR Articles 15-22, owned by the sibling
 assessment lane that runs before the processing is bound to
 production.
 
-Status: **SKELETON**, with CORE-PRIM part 1 of 2 complete: the
-first five action steps have deterministic primitives (see
-*Primitives* below). The steps are not yet bound, so the compiled
-targets still carry the scaffold. The DPO-consultation intake, the
-supervisory-authority pre-consultation submission chain, and the
-DPIA-document template arrive with part 2 and the wire.
+Status: **SKELETON**, with CORE-PRIM complete: all ten action steps
+have deterministic primitives (see *Primitives* below). The steps are
+not yet bound, so the compiled targets still carry the scaffold until
+the wire lands.
 
 ## Contents
 
@@ -36,8 +34,7 @@ DPIA-document template arrive with part 2 and the wire.
   anchors, the PM-9 / RA-3 / AU-9 OSCAL anchors called out in
   the task brief, and the D3-OAM D3FEND anchor on the
   identify_and_assess_risks step.
-- `primitives/` — deterministic primitives, one per action step;
-  the first five so far.
+- `primitives/` — deterministic primitives, one per action step.
 
 ## Compile targets
 
@@ -84,7 +81,7 @@ are populated.
 
 ## Primitives
 
-CORE-PRIM part 1 of 2. The first five action steps have a
+CORE-PRIM complete, in two parts. Each of the ten action steps has a
 deterministic primitive under `primitives/`, executed directly by
 `tests/playbooks/data_protection_impact_assessment/test_primitives.py`.
 Every rule was checked against Regulation (EU) 2016/679 on EUR-Lex
@@ -98,6 +95,11 @@ rev.01.
 | gather_processing_description | `description.compose_processing_description` |
 | assess_necessity_and_proportionality | `necessity.assess_necessity_and_proportionality` |
 | identify_and_assess_risks | `risk.assess_risks` |
+| identify_and_document_mitigations | `mitigations.document_mitigations` |
+| dpo_consultation | `consultation.record_dpo_consultation` |
+| determine_article_36_gate | `prior_consultation.determine_prior_consultation` |
+| produce_dpia_document | `document.compose_dpia_document` |
+| schedule_review_cadence | `review.schedule_review` |
 
 Decisions the primitives fix:
 
@@ -129,14 +131,40 @@ Decisions the primitives fix:
   operator's floor. Illegitimate access, undesired modification and
   disappearance must each be covered, or the assessment is
   incomplete.
+- **Residual risk is recorded per risk.** Each measure names the
+  risks it addresses (Art. 35(7)(d)), and every assessed risk gets a
+  residual level after the measures. A residual level cannot exceed the
+  assessed one, and a risk no measure addresses keeps its assessed
+  level. A high risk left untreated is a gap.
+- **Departures are documented.** Where a DPO is designated, the
+  advice is recorded (Art. 35(2)); departing from it needs documented
+  reasons, as WP248 asks. Where none is designated, the alternative
+  accountability surface is named. The data subjects' views are
+  recorded where sought (Art. 35(9)), with reasons when the decision
+  differs from them, or a justification when they are not sought.
+- **Prior consultation reads the residual risk.** Following WP248
+  section III.E, Art. 36(1) applies when a residual risk stays high.
+  Art. 36(5) Member State law also sets the flag. Once the authority
+  receives the request, the Art. 36(2) windows are recorded: eight
+  weeks for written advice, fourteen if extended, and one month to
+  notify an extension. A suspension would move them.
+- **The document is final only with nothing left open.** It joins the
+  nine records of one case and refuses records from another chain.
+  Description gaps, measures still owed, unassessed risk events,
+  untreated high risks and consultation gaps keep it a draft. Its
+  conclusion is `do_not_proceed` for processing that is not necessary
+  or not proportionate, `prior_consultation_required` when the
+  Art. 36 gate is set, and `may_proceed` otherwise.
+- **A change of risk always triggers a review** (Art. 35(11)). The
+  operator adds specific triggers and a maximum interval, and the next
+  review falls due within it.
 - **Every record's id covers its whole content.** Two records that
   differ anywhere have different ids.
 
-**Owed: part 2 and the wire.** Part 2 covers the mitigations, the DPO
-consultation, the Art. 36 gate, the document and the review cadence.
-The wire then binds all ten steps, adds the gates the description
-promises (a negative screening ends the lifecycle), declares the
-adapter inputs and regenerates the three targets.
+**Owed: the wire.** It binds all ten steps and adds the gate the
+description promises: a negative screening ends the lifecycle. It
+also declares the adapter inputs and regenerates the three
+targets.
 
 ## Regulatory anchors
 
