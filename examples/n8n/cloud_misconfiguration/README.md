@@ -3,10 +3,12 @@
 Worked example: the `playbook.cloud_misconfiguration@v1` CACAO v2
 playbook compiled by the n8n reference compiler. Operators can import
 `workflow.json` directly into an n8n instance to see the topology the
-emitter produces; binding the placeholder steps to real connectors
-(CSPM / posture-management platform, cloud inventory and ownership
-graph, ticketing / chat / paging channel, change-management system,
-re-scan trigger) is the operator's job.
+emitter produces. Each of the seven action steps compiles to a Code
+node that calls its bound primitive; binding the inputs those calls
+read to real connectors (CSPM / posture-management platform, cloud
+inventory and ownership graph, exception ledger, ticketing / chat /
+paging channel, change-management system, re-scan trigger) is the
+operator's job.
 
 ## Source
 
@@ -39,10 +41,13 @@ script.
    review and bind it to your own connectors before activating.
 
 The emitted workflow is a *snapshot of intent*, not a runnable
-playbook. The Set nodes carry the CACAO I/O contract (`in_args` /
-`out_args`) plus the `x_secops_ng` reference bundles (control,
-detection, telemetry, metric) as editable assignments; binding those
-rows to real connectors is the operator's job.
+playbook. Each action step is a Code node that imports its primitive
+from `content.playbooks.cloud_misconfiguration.primitives` and binds the
+step's output envelope to the call, and the two IF nodes read the real
+booleans extracted from the enrichment and re-scan envelopes. Supplying
+the adapter inputs those calls read (the posture finding, the inventory
+and ownership records, the exception ledger, the routing table, the
+remediation attempt and the re-scan result) is the operator's job.
 
 ## Regeneration
 
@@ -64,11 +69,13 @@ The canonical playbook under
 `content/playbooks/cloud_misconfiguration/playbook.cacao.json` is the
 single source. The
 `tests/examples/cloud_misconfiguration/test_n8n_workflow.py` suite
-pins the byte-identical drift guard, the node-id ↔ CACAO-action-id
-parity check, and the post Set-node-uplift semantic checks
-(`in_args` / `out_args` surfacing, `x_secops_ng` reference
-pass-through, no empty-assignment Set nodes, `noOp` reserved for the
-`end` sentinel).
+pins the byte-identical drift guard and the node-id ↔ CACAO-action-id
+parity check, and
+`tests/examples/n8n/cloud_misconfiguration/test_golden.py` checks that
+every bound step is a Code node calling its primitive and that both IF
+nodes read the extracted booleans. The Set-node checks stay in both
+files for any step that is unbound again; with all seven bound they
+have nothing to check.
 
 ## Mirroring policy
 
@@ -77,7 +84,8 @@ The mapping from CACAO to n8n is the same one the compiler implements:
 | CACAO step type    | n8n node type                                       |
 |--------------------|-----------------------------------------------------|
 | `start`            | `n8n-nodes-base.manualTrigger`                      |
-| `action` (no cmds) | `n8n-nodes-base.set` (carries CACAO I/O + refs)     |
+| `action` (bound)   | `n8n-nodes-base.code` (imports and calls `core_body`) |
+| `action` (unbound) | `n8n-nodes-base.set` (carries CACAO I/O + refs)     |
 | `if-condition`     | `n8n-nodes-base.if`                                 |
 | `switch-condition` | `n8n-nodes-base.switch`                             |
 | `end`              | `n8n-nodes-base.noOp`                               |
@@ -89,24 +97,25 @@ becomes n8n `connections` edges.
 
 ## What this example does not do
 
-The n8n reference compiler translates **structure** and the
-**CACAO I/O contract**, not **business logic**. The emitted workflow
-carries the topology of the playbook (steps, transitions, conditional
-routing), the per-step `in_args` / `out_args` and the `x_secops_ng`
-reference bundles as Set rows, plus the lossy-translation notes
-recorded under `meta.secops_ng_notes`. It does not carry:
+The emitted workflow carries the topology of the playbook (steps,
+transitions, conditional routing), one Code node per action step
+calling its primitive, and the lossy-translation notes recorded under
+`meta.secops_ng_notes`, of which this playbook has none. It does not
+carry:
 
 - Operator-bound bindings (CSPM / posture-management platform, cloud
   inventory and ownership graph, ticketing / chat / paging channel,
   change-management system, re-scan trigger, escalation paging
   endpoint).
 - Credentials, secrets, or environment-specific endpoints.
-- Suppression-window expressions, severity-classification logic, or
-  remediation-attestation logic — these are intent-bearing values
-  the operator sets when binding the workflow to their environment.
-- The recurring-misconfiguration KRI accounting — that lives in the
-  metric bindings referenced from the canonical playbook; the emitter
-  carries only the steps that emit against it, not the metric itself.
+- The operator's policy: the classification policy, the exception
+  ledger, the per-severity routing and the default ownership pool
+  arrive as adapter inputs. The rules applied to them (suppression only
+  by a live, exact, time-boxed entry; attested remediation; verification
+  only by a fresh pass under the same baseline) are fixed in the
+  primitives and pinned by their tests.
+- The recurring-misconfiguration KRI itself. The suppression and
+  escalation steps stamp it; the metric lives in the catalogue.
 
 Where a CACAO step expresses intent the target runtime cannot encode
 (an `if-condition` with no machine-readable expression, etc.), the
