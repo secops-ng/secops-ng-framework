@@ -2490,6 +2490,31 @@ one playbook's provenance.
     are recorded, a sufficient less intrusive alternative defeats
     necessity, and every risk names its sources, threats and impacts
     with all three reference events covered).
+  - CORE-WIRE + GRADUATE — #1059, closing #1057 (`cloud_misconfiguration`:
+    all seven action steps bound through `core_body`, each carrying its
+    `secops-ng-primitive` command in place of the manual one; both gate
+    booleans are extracted from the enrichment and re-scan envelopes,
+    the exception ledger and prior closures ride as JSON strings, and
+    the cookbook's six-step count and premature shipped claim are
+    corrected; three targets regenerated; `experimental` → `stable`,
+    `content_version` 1.0.0 on a recomputed checklist — the card's first
+    graduation).
+  - CORE-PRIM part 2 — #1060, closing #1058 (`data_protection_impact_assessment`:
+    primitives for the last five steps, completing all ten; every risk
+    gets a residual level never above its assessed one, departures from
+    the DPO's advice or the data subjects' views are documented, the
+    Art. 36(1) gate reads the residual risk as WP248 III.E does and
+    records the Art. 36(2) windows, the document is final only with
+    nothing open, and a change of risk always triggers a review).
+  - CORE-PRIM — #1061 (`threat_intel_ingest`: primitives for all four
+    action steps, from none; a capture is read to the last TAXII
+    envelope or refused, only the current, unrevoked, valid version of
+    each STIX Indicator counts, only an exact value with a stated
+    confidence at or above the threshold is blocked and never a
+    protected or non-global one, deduplication never swallows an
+    escalation to blocking, propagation counts only when every lane the
+    kind needs accepted it, and every indicator is armed or recorded as
+    a gap).
   - CORE-PRIM — #1063 (`network_security`: primitives for all five
     action steps, from none; inventory sources in the operator's
     precedence with every disagreement recorded and undeclared segments
@@ -2501,31 +2526,6 @@ one playbook's provenance.
     consent, and one checked evidence chain per window; the playbook's
     RTS citation corrected to Delegated Regulation (EU) 2024/1774
     Art. 13).
-  - CORE-PRIM — #1061 (`threat_intel_ingest`: primitives for all four
-    action steps, from none; a capture is read to the last TAXII
-    envelope or refused, only the current, unrevoked, valid version of
-    each STIX Indicator counts, only an exact value with a stated
-    confidence at or above the threshold is blocked and never a
-    protected or non-global one, deduplication never swallows an
-    escalation to blocking, propagation counts only when every lane the
-    kind needs accepted it, and every indicator is armed or recorded as
-    a gap).
-  - CORE-PRIM part 2 — #1060, closing #1058 (`data_protection_impact_assessment`:
-    primitives for the last five steps, completing all ten; every risk
-    gets a residual level never above its assessed one, departures from
-    the DPO's advice or the data subjects' views are documented, the
-    Art. 36(1) gate reads the residual risk as WP248 III.E does and
-    records the Art. 36(2) windows, the document is final only with
-    nothing open, and a change of risk always triggers a review).
-  - CORE-WIRE + GRADUATE — #1059, closing #1057 (`cloud_misconfiguration`:
-    all seven action steps bound through `core_body`, each carrying its
-    `secops-ng-primitive` command in place of the manual one; both gate
-    booleans are extracted from the enrichment and re-scan envelopes,
-    the exception ledger and prior closures ride as JSON strings, and
-    the cookbook's six-step count and premature shipped claim are
-    corrected; three targets regenerated; `experimental` → `stable`,
-    `content_version` 1.0.0 on a recomputed checklist — the card's first
-    graduation).
 
 ## Epic PT — Pattern Library
 
