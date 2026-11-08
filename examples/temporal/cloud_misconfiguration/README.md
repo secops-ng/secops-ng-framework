@@ -3,10 +3,14 @@
 Worked example: the `playbook.cloud_misconfiguration@v1` CACAO v2
 playbook compiled by the Temporal reference compiler. Operators who
 already run Temporal can import `workflow.temporal.py` into their worker
-module to see the topology the emitter produces; binding the activity
-bodies to real connectors (CSPM / posture-management platform, cloud
-inventory and ownership graph, ticketing / chat / paging channel,
-change-management system, re-scan trigger) is the operator's job.
+module to see the topology the emitter produces. Each of the seven
+activity bodies imports and calls its bound primitive. Sequencing the
+activities through the two gates (the workflow's `run` method still
+raises `NotImplementedError`, as it does for every playbook) and
+binding the inputs the primitives read to real connectors (CSPM /
+posture-management platform, cloud inventory and ownership graph,
+exception ledger, ticketing / chat / paging channel, change-management
+system, re-scan trigger) is the operator's job.
 
 ## Source
 
@@ -62,11 +66,9 @@ playbook's internals.
 
 ## What this example does not do
 
-The Temporal reference compiler translates **structure**, not
-**business logic**. The emitted stub carries the topology of the
-playbook (activities, retry policies, the workflow class shell) but
-the activity bodies and workflow control flow are intentionally
-`NotImplementedError`:
+The emitted module carries the activities, their retry policies and
+the workflow class shell. Each activity calls its bound primitive; the
+workflow's control flow is left to the integrator. It does not carry:
 
 - Operator-bound bindings (CSPM / posture-management platform, cloud
   inventory and ownership graph, ticketing / chat / paging channel,
@@ -76,14 +78,13 @@ the activity bodies and workflow control flow are intentionally
 - Credentials, secrets, and environment-specific endpoints are not
   embedded — secrets stay with the operator and are injected at
   worker startup, not at compile time.
-- Suppression-window expressions, severity-classification logic, and
-  remediation-attestation logic are not embedded — these are
-  intent-bearing values the operator sets when binding the workflow
-  to their environment.
-- The recurring-misconfiguration KRI accounting is not embedded —
-  that lives in the metric bindings referenced from the canonical
-  playbook; the emitter carries only the activities that emit
-  against it, not the metric itself.
+- The operator's policy is not embedded: the classification policy,
+  the exception ledger, the per-severity routing and the default
+  ownership pool arrive as adapter inputs. The rules applied to them
+  are fixed in the primitives and pinned by their tests.
+- The recurring-misconfiguration KRI itself is not embedded. The
+  suppression and escalation activities stamp it; the metric lives in
+  the catalogue.
 - It does not pick a Temporal deployment posture. Self-hosted
   (Temporal OSS on EU sovereign infrastructure) and managed
   (Temporal Cloud) are both supported by the same emitted source.

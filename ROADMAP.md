@@ -2490,6 +2490,15 @@ one playbook's provenance.
     are recorded, a sufficient less intrusive alternative defeats
     necessity, and every risk names its sources, threats and impacts
     with all three reference events covered).
+  - CORE-WIRE + GRADUATE — #1059, closing #1057 (`cloud_misconfiguration`:
+    all seven action steps bound through `core_body`, each carrying its
+    `secops-ng-primitive` command in place of the manual one; both gate
+    booleans are extracted from the enrichment and re-scan envelopes,
+    the exception ledger and prior closures ride as JSON strings, and
+    the cookbook's six-step count and premature shipped claim are
+    corrected; three targets regenerated; `experimental` → `stable`,
+    `content_version` 1.0.0 on a recomputed checklist — the card's first
+    graduation).
 
 ## Epic PT — Pattern Library
 

@@ -97,7 +97,7 @@ content/mappings/gdpr/data-flow-cloud_misconfiguration.md
 ```
 
 The CACAO source is canonical. The two `if-condition` branches
-(known-false-positive gate; remediation-verified gate), the six
+(known-false-positive gate; remediation-verified gate), the seven
 `action` steps, and the one `start` / one `end` wiring nodes are the
 deterministic policy the playbook *means* — an ingest step feeding an
 enrichment feeding a false-positive gate that either short-circuits
@@ -115,7 +115,7 @@ paging channel — is the operator's data plane.
 
 ## 2. CACAO topology and lifecycle binding
 
-The playbook ships eleven steps: one `start`, six `action`, two
+The playbook ships eleven steps: one `start`, seven `action`, two
 `if-condition`, and one terminal `end` reached from three inbound
 edges (suppression-close, verified-fix, and escalate-then-close). The
 first `if-condition` (`known false positive?`) fires on
@@ -127,23 +127,24 @@ chain. The second `if-condition` (`remediation verified?`) fires on
 the same end so the case is closed under both branches with an
 audit-evident trail.
 
-| Step suffix    | Step                          | Discipline                                                                                                                                                                                                                                        | Status         |
+| Step suffix    | Step                          | Discipline                                                                                                                                                                                                                                        | Primitive      |
 |----------------|-------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|
 | `…000000001`   | cloud-misconfig-start         | edge wiring only — no body                                                                                                                                                                                                                        | n/a            |
-| `…000000002`   | ingest finding                | receive the Compliance Finding from the operator's CSPM / posture-management layer (rule fingerprint, affected resource, evaluated baseline, first-observed timestamp) and normalise it into the case shape the rest of the workflow reads       | operator-bound |
-| `…000000003`   | enrich resource and owner     | resolve tenant, account, region, resource type, tags, and accountable owner against the operator's cloud-inventory and ownership graph; annotate the case with the routing context the notification and escalation steps read against            | operator-bound |
+| `…000000002`   | ingest finding                | receive the Compliance Finding from the operator's CSPM / posture-management layer (rule fingerprint, affected resource, evaluated baseline, first-observed timestamp) and normalise it into the case shape the rest of the workflow reads       | `finding.normalise_posture_finding` |
+| `…000000003`   | enrich resource and owner     | resolve tenant, account, region, resource type, tags, and accountable owner against the operator's cloud-inventory and ownership graph; annotate the case with the routing context the notification and escalation steps read against            | `context.resolve_resource_context` |
 | `…000000004`   | known false positive?         | `if-condition` — branches on `__known_false_positive__` (true → suppress and close; false → notify owner)                                                                                                                                       | n/a            |
-| `…000000005`   | suppress and close            | record the suppression against the operator's exception ledger (rule fingerprint, resource id, exception owner, expiry) and close the case without a remediation attempt so an already-triaged benign deviation stops re-paging owners           | operator-bound |
-| `…000000006`   | notify owner                  | hand off along the operator's pre-bound channel per `__severity__` (ticketing / chat / paging) carrying the finding, the affected resource, the violated baseline, and a pointer to the guided-remediation runbook the next step references     | operator-bound |
-| `…000000007`   | guided remediation            | apply the remediation bound to the violated baseline rule via an attested change — an IaC pull request against the operator's declarative-infrastructure repository or a runbook execution the operator's platform automates                    | operator-bound |
-| `…000000008`   | re-scan                       | targeted re-evaluation of the same baseline rule against the affected resource; writes `__remediation_verified__` for the next gate                                                                                                               | operator-bound |
+| `…000000005`   | suppress and close            | record the suppression against the operator's exception ledger (rule fingerprint, resource id, exception owner, expiry) and close the case without a remediation attempt so an already-triaged benign deviation stops re-paging owners           | `suppression.compose_suppression_closure` |
+| `…000000006`   | notify owner                  | hand off along the operator's pre-bound channel per `__severity__` (ticketing / chat / paging) carrying the finding, the affected resource, the violated baseline, and a pointer to the guided-remediation runbook the next step references     | `notification.compose_owner_notification` |
+| `…000000007`   | guided remediation            | apply the remediation bound to the violated baseline rule via an attested change — an IaC pull request against the operator's declarative-infrastructure repository or a runbook execution the operator's platform automates                    | `remediation.record_remediation_attempt` |
+| `…000000008`   | re-scan                       | targeted re-evaluation of the same baseline rule against the affected resource; writes `__remediation_verified__` for the next gate                                                                                                               | `verification.verify_remediation` |
 | `…000000009`   | remediation verified?         | `if-condition` — branches on `__remediation_verified__` (true → cloud-misconfig-end; false → escalate)                                                                                                                                             | n/a            |
-| `…00000000b`   | escalate                      | compose the escalation payload (finding, attempted remediation, failing re-scan evidence) and hand off along the operator's pre-bound paging channel; the case is tracked against the recurring-misconfiguration KRI                              | operator-bound |
+| `…00000000b`   | escalate                      | compose the escalation payload (finding, attempted remediation, failing re-scan evidence) and hand off along the operator's pre-bound paging channel; the case is tracked against the recurring-misconfiguration KRI                              | `escalation.compose_escalation` |
 | `…00000000a`   | cloud-misconfig-end           | edge wiring only — no body (closure, from any of: suppression, verified-fix, escalate-then-close)                                                                                                                                                 | n/a            |
 
-All six action steps carry the CACAO I/O contract (`in_args` /
-`out_args`) plus `x_secops_ng` reference bundles (detection, control,
-telemetry, metric). One execution short-circuits through the
+All seven action steps carry the CACAO I/O contract (`in_args` /
+`out_args`), the SecOps-NG reference bundles (detection, control,
+telemetry, metric) and a `core_body` binding to the primitive in the
+Primitive column. One execution short-circuits through the
 suppression branch when the deviation is known-benign, or runs the
 linear four-step remediation chain (notify → remediate → re-scan →
 close) exactly once and — if the re-scan does not verify — takes the
@@ -151,13 +152,13 @@ escalation branch before closure. Per-case metric accounting into
 the MTTD / MTTR / cloud-posture-coverage KPI catalogue and the
 recurring-misconfig KRI is unambiguous.
 
-> The playbook maturity is `Shipped` across all three compile
-> targets: the n8n, Temporal, and LangGraph worked examples all ship
-> committed emitter output today, and cross-target byte-parity
-> goldens live under `tests/examples/cloud_misconfiguration/` (see
-> § 5).
+> The playbook is `stable` (`content_version` 1.0.0): all seven
+> action steps bind a deterministic primitive through `core_body`, the
+> n8n, Temporal and LangGraph worked examples emit those calls, and
+> cross-target byte-parity goldens live under
+> `tests/examples/cloud_misconfiguration/` (see § 5).
 
-## 3. Lifecycle contract — the six action states
+## 3. Lifecycle contract — the seven action states
 
 The per-case payload — finding, affected resource, ownership context,
 suppression decision, notification stamp, remediation attempt, and
@@ -167,7 +168,7 @@ markers, owner tags). The inbound GDPR Art. 30 Record of Processing
 Activity at
 [`content/mappings/gdpr/data-flow-cloud_misconfiguration.md`](../../content/mappings/gdpr/data-flow-cloud_misconfiguration.md)
 covers the resource-ownership enrichment and owner-notification
-processing the six steps below operate on; lawful-basis-grounded in
+processing the seven steps below operate on; lawful-basis-grounded in
 GDPR Art. 6(1)(f) legitimate interests with Art. 6(1)(c) legal
 obligation as the secondary basis where NIS2 Art. 21(2)(e) / (2)(i)
 transposition applies. Personal data does not sit on the finding
@@ -300,12 +301,14 @@ covers that processing per AGENTS.md §3.
     `kri.recurring_cloud_misconfig@v1` so chronic deviation surfaces
     in the metrics layer.
 
-The six action steps are operator-bound runtime seams: the framework
-ships neither the CSPM layer, the ownership graph, the suppression
+Each action step calls a deterministic primitive, listed in the
+table in § 2 and explained in the playbook README, but the surfaces
+those primitives read and act on stay operator-bound: the framework
+ships neither the CSPM layer, the ownership graph, the exception
 ledger, the notification-channel binding, the IaC pull-request
-surface, nor the runbook registry. The playbook is the portable
-description of *what* the operator's stack should do per case;
-binding those seams to real endpoints is the operator's job.
+surface, nor the runbook registry. The playbook fixes *what* each case
+must satisfy; the adapters that supply the primitives' inputs, and
+act on what they return, are the operator's job.
 
 > **LM determinism.** Ingest, enrichment, suppression, notification,
 > guided remediation, re-scan, and escalation are structured reads
@@ -464,43 +467,43 @@ v1.3.0, and 5023 is documented in 1.4.0; once a
 
 ## 5. Per-target hand-off
 
-### 5.1 n8n — operator-edited Set rows over the cloud-misconfig topology
+### 5.1 n8n — Code nodes over the cloud-misconfig topology
 
 `examples/n8n/cloud_misconfiguration/workflow.json` carries the CACAO
-topology as eleven n8n nodes (`manualTrigger`, six `set` nodes, two
-`if`, one `noOp` terminal), with node ids preserving the CACAO step
-ids verbatim. The six action steps emit `n8n-nodes-base.set` nodes
-carrying the CACAO I/O contract as editable assignment rows plus the
-`x_secops_ng` reference bundles (detection, control, telemetry,
-metric). The two `if-condition` nodes (`known false positive?`,
-`remediation verified?`) emit `n8n-nodes-base.if` nodes whose
-conditions read `__known_false_positive__` (set by the enrich step,
-surfaced on its Set node as `out.known_false_positive`) and
-`__remediation_verified__` (set by the re-scan step,
-`out.remediation_verified`). The remaining lossy translations — one
-per unbound action — are recorded in `meta.secops_ng_notes` so the
-integrator sees exactly which seams need attention.
+topology as n8n nodes with ids preserving the CACAO step ids verbatim:
+a `manualTrigger`, seven `code` nodes, two `if` nodes, the `noOp`
+terminal, and the playbook card sticky note. Each action step's Code
+node imports its primitive from
+`content.playbooks.cloud_misconfiguration.primitives` and binds the
+step's output envelope to the call. The two `if-condition` nodes
+(`known false positive?`, `remediation verified?`) read
+`__known_false_positive__`, extracted from the enrichment envelope
+`__resource_context__`, and `__remediation_verified__`, extracted from
+the re-scan envelope `__rescan_verdict__`; both are real booleans the
+gate compares to true. With every step bound and both conditions
+machine-readable, `meta.secops_ng_notes` records no lossy translations.
 
-Operators bind the Set rows to their connectors:
+Operators wire the adapters that supply each Code node's inputs:
 
 - `ingest finding` → the operator's CSPM / posture-management layer's
-  finding-fetch or webhook surface; writes the normalised case
-  shape.
-- `enrich resource and owner` → the operator's cloud-inventory and
-  ownership-graph read APIs; writes ownership context onto the case.
-- `suppress and close` → the operator's suppression / exception
-  ledger (SCIM-driven store, ticketing-system tag, or purpose-built
-  exception service).
-- `notify owner` → the operator's pre-bound notification channel per
-  `__severity__` (ticketing / chat / paging).
-- `guided remediation` → the operator's IaC pull-request surface
-  (GitLab / GitHub / a hosted Git provider) or the runbook-execution
-  surface for the automated branches (a hosted automation service, a
-  self-hosted runner).
-- `re-scan` → the operator's CSPM layer's targeted-rescan API
-  against the affected resource.
-- `escalate` → the operator's paging surface for the security-
-  engineering on-call.
+  finding-fetch or webhook surface, supplying `__posture_finding__`
+  for `__finding_id__`.
+- `enrich resource and owner` → the cloud-inventory and ownership-graph
+  read APIs (`__inventory_record__`, `__ownership_record__`), the
+  exception ledger (`__exception_ledger__`) and the case ledger's prior
+  closures (`__prior_closures__`), plus the operator's default pool and
+  classification policy.
+- `suppress and close` → the exception ledger the closure is stamped
+  against.
+- `notify owner` → the operator's pre-bound channels, one per resolved
+  severity (`__severity_routing__`), and the runbook for the rule.
+- `guided remediation` → the IaC pull-request surface or the
+  runbook-execution surface, which reports the attempt
+  (`__remediation_attempt__`) with its change record and approver.
+- `re-scan` → the CSPM layer's targeted-rescan API against the
+  affected resource (`__rescan_result__`).
+- `escalate` → the paging surface for the security-engineering
+  on-call (`__paging_channel_ref__`).
 
 To regenerate the compiled workflow artifact from the repo root:
 
@@ -511,17 +514,19 @@ To regenerate the compiled workflow artifact from the repo root:
 To import into an n8n instance: open the workflows list, choose
 **Import from File**, and select
 `examples/n8n/cloud_misconfiguration/workflow.json`. The workflow is
-inactive by default — review and bind the Set rows to your own
-connectors before activating. The emitted workflow is a *snapshot of
+inactive by default — review it and wire its adapter inputs to your
+own connectors before activating. The emitted workflow is a *snapshot of
 intent*, not a runnable playbook.
 
 ### 5.2 Temporal — `@activity.defn` bodies
 
 `examples/temporal/cloud_misconfiguration/workflow.temporal.py` is a
 standard Temporal worker module: one `@workflow.defn` class and one
-`@activity.defn` function per CACAO action, with the six action
-activities documenting their operator-bound seam (ingest, enrichment,
-suppression, notification, guided remediation, re-scan, escalation).
+`@activity.defn` function per CACAO action. Each of the seven
+activity bodies imports and calls its bound primitive; the workflow's
+`run` method still raises `NotImplementedError`, so sequencing the
+activities through the two gates is the integrator's, as for every
+playbook.
 Per-activity retry policies are emitted alongside the activities so
 the operator can pin them on the `workflow.execute_activity` call
 sites; the workflow lowering itself is the standard target-neutral
@@ -543,7 +548,8 @@ so the worker module is a self-contained drop-in.
 ### 5.3 LangGraph — `@tool` wrappers + agentic-extension hook
 
 `examples/langgraph/cloud_misconfiguration/state_bindings.py` carries
-the `TypedDict` state and the six `@tool`-decorated action wrappers.
+the `TypedDict` state and the seven `@tool`-decorated action wrappers,
+each calling its bound primitive.
 `graph_spec.json` carries the target-neutral topology (nodes,
 conditional edges on `__known_false_positive__` and
 `__remediation_verified__`, linear edges through the remediation
