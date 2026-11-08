@@ -2490,6 +2490,17 @@ one playbook's provenance.
     are recorded, a sufficient less intrusive alternative defeats
     necessity, and every risk names its sources, threats and impacts
     with all three reference events covered).
+  - CORE-PRIM — #1063 (`network_security`: primitives for all five
+    action steps, from none; inventory sources in the operator's
+    precedence with every disagreement recorded and undeclared segments
+    listed as undocumented, every unlisted zone pair denied, conditions
+    as services or a time-boxed authorisation, observed transits outside
+    the matrix classified as undocumented transit or unauthorised
+    egress, boundary rules that diverge from it as drift in either
+    direction, isolation only for active abuse with the operator's
+    consent, and one checked evidence chain per window; the playbook's
+    RTS citation corrected to Delegated Regulation (EU) 2024/1774
+    Art. 13).
 
 ## Epic PT — Pattern Library
 
