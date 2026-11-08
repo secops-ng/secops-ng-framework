@@ -47,6 +47,62 @@ window.
   inbound regulatory anchors (`nis2:art-21-2-e-network-security`,
   `dora:art-9-network-security`; CRA and GDPR deliberately excluded
   with orphan-skip entries).
+- `primitives/` — one deterministic primitive per action step (see
+  Status).
+
+## Status
+
+`maturity: experimental`, CORE-PRIM complete. Each of the five action
+steps has a deterministic primitive under `primitives/`, executed
+directly by `tests/playbooks/network_security/test_primitives.py`.
+
+| Step | Primitive |
+|---|---|
+| inventory_network_segments | `inventory.compose_segment_inventory` |
+| evaluate_segmentation_policy | `policy.evaluate_segmentation_policy` |
+| detect_policy_violations | `detection.detect_policy_violations` |
+| enforce_remediation | `remediation.dispatch_remediation` |
+| generate_posture_evidence_artifact | `evidence.compose_posture_evidence` |
+
+Decisions the primitives fix:
+
+- **Precedence decides, disagreement is recorded.** Inventory sources
+  are read highest precedence first; the higher source's record wins
+  and every field a lower source disagrees on is recorded.
+- **Documented means declared.** A segment only a provider API or a
+  network controller reports is listed as undocumented (Commission
+  Implementing Regulation (EU) 2024/2690, Annex point 6.7.2(a);
+  Delegated Regulation (EU) 2024/1774, Art. 13(b)).
+- **Every unlisted zone pair is denied**, within a zone as well as
+  between zones (Annex points 6.7.2(c) and 6.8.2(e)). A conditional
+  allowance names services, a time-boxed authorisation with both
+  bounds (Annex point 6.7.2(h)), or both.
+- **The policy's own gaps are recorded, not fatal:** zones of
+  inventoried segments it does not declare, no dedicated
+  administration zone (Art. 13(c); Annex point 6.8.2(f)), an
+  administration zone reachable from outside, no allowance at all.
+- **Two kinds of violation.** An observed transit the matrix does not
+  permit is unauthorised egress when it leaves the estate and
+  undocumented transit otherwise. A boundary rule that permits what
+  the matrix denies, or denies what it plainly allows, is drift,
+  whether or not traffic was seen.
+- **Isolation only for active abuse, with the operator's consent.**
+  Every violation is dispatched to the surface the operator binds to
+  its classification; it is isolated instead (Art. 13(j)) only when it
+  carries an active-abuse fingerprint and automated isolation is
+  allowed. The step does not close until every dispatch has returned
+  a persistent identifier.
+- **One checked chain per window.** The evidence refuses records from
+  another inventory, snapshot or violation set, gives every finding
+  its action, and carries undocumented segments, source disagreements
+  and policy gaps as open items, so a clean violation set over an
+  incomplete inventory does not read as a clean window.
+- **Replays recover the same identifiers.** Inventory, snapshot,
+  violation and evidence identifiers are digests of content, never of
+  the clock.
+
+Owed: the wire. The five steps are not yet bound through `core_body`,
+and the playbook stays `experimental` until they are.
 
 ## Operator-supplied bindings
 
