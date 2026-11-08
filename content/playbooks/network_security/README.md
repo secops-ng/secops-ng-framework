@@ -21,7 +21,7 @@ window.
 - **DORA Art. 9** — protection and prevention (ICT security tools,
   policies and procedures), read against the JC RTS on ICT risk
   management framework (Commission Delegated Regulation (EU)
-  2024/1774) Art. 12 network-security controls.
+  2024/1774) Art. 13 network security management.
 - **CRA** — no direct inbound. Estate-wide network-segmentation
   reconciliation is an operator obligation surface; the CRA
   clause-by-clause review is recorded in

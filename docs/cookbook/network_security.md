@@ -50,7 +50,7 @@ that the deployed estate stays in agreement with it — not once at
 audit time, but continuously across every reconciliation window the
 operator declares. DORA Article 9 (read against the JC RTS on ICT risk
 management framework, Commission Delegated Regulation (EU) 2024/1774
-Art. 12) places the same obligation on financial entities under a
+Art. 13) places the same obligation on financial entities under a
 DORA-flavoured framing: ICT-security tools, policies and procedures
 covering the network layer.
 
@@ -368,7 +368,7 @@ Companion inbound anchors are wired in the mappings overlay:
 - **DORA Art. 9** — sibling anchor. The network-security atom of
   the ICT protection and prevention obligation reads against the
   JC RTS on ICT risk management framework (Commission Delegated
-  Regulation (EU) 2024/1774) Art. 12 network-security controls.
+  Regulation (EU) 2024/1774) Art. 13 network security management.
   The inbound entry at
   `content/mappings/dora/article-9-network-security.yaml` backlinks
   `playbook.network_security@v1`.
