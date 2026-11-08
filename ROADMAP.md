@@ -2497,6 +2497,15 @@ one playbook's provenance.
     Art. 36(1) gate reads the residual risk as WP248 III.E does and
     records the Art. 36(2) windows, the document is final only with
     nothing open, and a change of risk always triggers a review).
+  - CORE-WIRE + GRADUATE — #1059, closing #1057 (`cloud_misconfiguration`:
+    all seven action steps bound through `core_body`, each carrying its
+    `secops-ng-primitive` command in place of the manual one; both gate
+    booleans are extracted from the enrichment and re-scan envelopes,
+    the exception ledger and prior closures ride as JSON strings, and
+    the cookbook's six-step count and premature shipped claim are
+    corrected; three targets regenerated; `experimental` → `stable`,
+    `content_version` 1.0.0 on a recomputed checklist — the card's first
+    graduation).
 
 ## Epic PT — Pattern Library
 
