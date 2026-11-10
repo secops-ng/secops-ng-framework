@@ -1,9 +1,18 @@
 {
-  "conditional_edges": [],
+  "conditional_edges": [
+    {
+      "branches": {
+        "failure": "__END__",
+        "success": "action--d91a35c0-0000-4000-8000-000000000003"
+      },
+      "default": null,
+      "src": "if-condition--d91a35c0-0000-4000-8000-00000000000c"
+    }
+  ],
   "edges": [
     {
       "cacao_edge": "on_completion",
-      "dst": "action--d91a35c0-0000-4000-8000-000000000003",
+      "dst": "if-condition--d91a35c0-0000-4000-8000-00000000000c",
       "src": "action--d91a35c0-0000-4000-8000-000000000002"
     },
     {
@@ -125,6 +134,13 @@
       "label": "schedule_review_cadence",
       "name": "action--d91a35c0-0000-4000-8000-00000000000b",
       "step_id": "action--d91a35c0-0000-4000-8000-00000000000b"
+    },
+    {
+      "cacao_type": "if-condition",
+      "kind": "condition",
+      "label": "dpia required?",
+      "name": "if-condition--d91a35c0-0000-4000-8000-00000000000c",
+      "step_id": "if-condition--d91a35c0-0000-4000-8000-00000000000c"
     }
   ],
   "playbook_id": "playbook--d91a35c0-0000-4000-8000-000000000001",

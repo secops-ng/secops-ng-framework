@@ -44,12 +44,11 @@ reference compile targets (n8n, Temporal, LangGraph) and shows
 where each lifecycle stage — threshold screening, scoping, risk
 assessment, safeguard design, DPO consultation, residual-risk
 determination, document assembly, and review scheduling — lands
-in each. Adapter bodies (processing-inventory join, DPO
-consultation channel, review-scheduler surface, DPIA-document
-template, supervisory-authority pre-consultation submission) are
-declared as adapter-bound surfaces the operator wires; the
-shipped CORE artifact (see § 2) lands the emitter fan-out, the
-evidence-record schema, and the byte-parity goldens.
+in each. Every action step calls a deterministic primitive under
+`primitives/`, and the playbook is `stable`. The operator surfaces
+(processing inventory, DPO consultation channel, supervisory-authority
+submission, document store, change management) stay operator-owned:
+they feed the adapter inputs the primitives read (§ 4, § 5).
 
 > The framework is framework-agnostic by construction. n8n /
 > Temporal / LangGraph are *three of three* reference targets;
@@ -124,7 +123,8 @@ is not.
 content/playbooks/data_protection_impact_assessment/
 ├── README.md                    # workflow-local overview and status
 ├── mappings.yaml                # outbound OSCAL / D3FEND / OCSF / GDPR overlay
-└── playbook.cacao.yaml          # canonical CACAO v2 source (playbook.data_protection_impact_assessment@v1)
+├── playbook.cacao.yaml          # canonical CACAO v2 source (playbook.data_protection_impact_assessment@v1)
+└── primitives/                  # one deterministic primitive per action step
 
 content/mappings/gdpr/article-35-dpia.yaml
                                   # GDPR Article 35 inbound anchors —
@@ -139,7 +139,7 @@ schemas/evidence/dpia.schema.json  # DPIA evidence-artifact schema
 ```
 
 The CACAO source is canonical. The ten-step lifecycle (one
-`start`, ten `action` steps, one `end`) is the deterministic
+`start`, ten `action` steps, one `if-condition` gate, one `end`) is the deterministic
 policy the playbook *means*. The three worked examples under
 `examples/{n8n,temporal,langgraph}/data_protection_impact_assessment/`
 are the same playbook compiled into three orchestrator idioms.
@@ -158,64 +158,74 @@ names this cookbook, the shipped CACAO source, the compiled
 targets, and the DPIA-evidence schema as the deliverables that
 discharge Article 35 coverage on the content axis; G-02 closes
 against the GDPR mappings file; G-03 closes against the
-byte-parity goldens the CORE artifact lands.
+byte-parity goldens under `tests/examples/data_protection_impact_assessment/`.
 
 ## 3. CACAO topology
 
-The workflow is a linear ten-step lifecycle. Each action step
-carries the CACAO I/O contract (`in_args` / `out_args`) plus
-`x_secops_ng` reference bundles pinning the OSCAL control anchor,
-D3FEND technique (where a defensive-technique fit exists), and
-OCSF telemetry class the step emits.
+Ten action steps and one gate. Each action step binds its primitive
+through `core_body` in the step's SecOps-NG extension and carries the
+matching `secops-ng-primitive` command, alongside the OSCAL control,
+D3FEND technique (where one fits) and OCSF telemetry references.
 
-| Step suffix | Step                                    | Discipline                                                                                                                             | Status         |
-|-------------|-----------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|----------------|
-| `…000001`   | dpia_start                              | edge wiring only — no body                                                                                                             | n/a            |
-| `…000002`   | screen_dpia_triggers                    | evaluate the Art. 35(1) high-risk test and Art. 35(3)(a)–(c) mandatory triggers; assign `__dpia_case_id__`; set `__dpia_required__` and `__screening_result_ref__` | adapter-bound  |
-| `…000003`   | classify_processing_type                | resolve the processing envelope against the operator's Article 30 record-of-processing-activities inventory; anchor scope              | adapter-bound  |
-| `…000004`   | gather_processing_description           | assemble the Article 35(7)(a) systematic description (purposes, categories of data and subjects, recipients, retention); sets `__processing_description_ref__` | adapter-bound  |
-| `…000005`   | assess_necessity_and_proportionality    | assess Article 35(7)(b) necessity and proportionality of the processing in relation to the purposes                                    | adapter-bound  |
-| `…000006`   | identify_and_assess_risks               | apply the operator's risk taxonomy over the Article 35(7)(c) rights-and-freedoms axis; sets `__risk_assessment_ref__`                  | adapter-bound  |
-| `…000007`   | identify_and_document_mitigations       | document the Article 35(7)(d) safeguards, security measures, and mechanisms; sets `__mitigations_ref__`                                | adapter-bound  |
-| `…000008`   | dpo_consultation                        | obtain the Article 35(2) DPO advice; sets `__dpo_consultation_ref__`                                                                   | adapter-bound  |
-| `…000009`   | determine_article_36_gate               | determine the Article 36(1) residual-risk verdict; sets `__article_36_pre_consultation_flag__`                                         | adapter-bound  |
-| `…00000a`   | produce_dpia_document                   | assemble the durable DPIA document for the Article 5(2) accountability posture; sets `__dpia_document_ref__`                           | adapter-bound  |
-| `…00000b`   | schedule_review_cadence                 | pin the Article 35(11) review hook against the operator's change-management surface; sets `__review_cadence__`                         | adapter-bound  |
-| `…00000f`   | dpia_end                                | edge wiring only — no body                                                                                                             | n/a            |
+| Step suffix | Step                                 | Primitive (`primitives/…`)                          | What it fixes |
+|-------------|--------------------------------------|-----------------------------------------------------|---------------|
+| `…000001`   | dpia_start                           | —                                                   | edge wiring only |
+| `…000002`   | screen_dpia_triggers                 | `screening.screen_dpia_triggers`                    | Art. 35(10), similar-assessment coverage, Art. 35(3), the Art. 35(4) and 35(5) lists and the WP248 two-criteria rule, first match wins |
+| `…00000c`   | dpia required?                       | — (if-condition on `__dpia_required__`)             | a negative screening ends the lifecycle |
+| `…000003`   | classify_processing_type             | `classification.classify_processing`                | the Art. 30 record's shape; processor role refused; lawfulness gaps recorded |
+| `…000004`   | gather_processing_description        | `description.compose_processing_description`        | the Art. 35(7)(a) description; missing WP248 Annex 2 elements as gaps |
+| `…000005`   | assess_necessity_and_proportionality | `necessity.assess_necessity_and_proportionality`    | Art. 35(7)(b); a sufficient less intrusive alternative defeats necessity |
+| `…000006`   | identify_and_assess_risks            | `risk.assess_risks`                                 | Art. 35(7)(c) on the operator's scale and floor; all three reference events |
+| `…000007`   | identify_and_document_mitigations    | `mitigations.document_mitigations`                  | Art. 35(7)(d); residual never above assessed; untreated high risk is a gap |
+| `…000008`   | dpo_consultation                     | `consultation.record_dpo_consultation`              | Art. 35(2) advice and Art. 35(9) views, departures documented |
+| `…000009`   | determine_article_36_gate            | `prior_consultation.determine_prior_consultation`   | Art. 36(1) on the residual risk, Art. 36(5), the Art. 36(2) windows |
+| `…00000a`   | produce_dpia_document                | `document.compose_dpia_document`                    | final only with nothing open; `do_not_proceed` / `prior_consultation_required` / `may_proceed` |
+| `…00000b`   | schedule_review_cadence              | `review.schedule_review`                            | Art. 35(11); a change of risk always triggers a review |
+| `…00000f`   | dpia_end                             | —                                                   | edge wiring only |
 
-> A false `__dpia_required__` outcome at `screen_dpia_triggers`
-> short-circuits the lifecycle: the negative screening is
-> retained on the accountability ledger and the workflow exits
-> without producing an Article 35(7) assessment. A false outcome
-> at `determine_article_36_gate` (i.e. residual risk below the
-> Article 36(1) high-risk threshold after mitigation) allows the
-> processing to proceed once `produce_dpia_document` and
-> `schedule_review_cadence` complete; a true outcome gates
-> deployment on the supervisory-authority pre-consultation
-> submission chain, which the shipped CORE artifact declares as
-> an adapter-bound surface.
+> A false `__dpia_required__` ends the lifecycle at the gate: the
+> negative screening is retained on the accountability ledger and no
+> Article 35(7) assessment is produced. Classification refuses a
+> screening that does not require a DPIA, so the gate is what lets a
+> negative case close cleanly instead of failing at step two. The
+> Article 36 flag is not a gate in the workflow: the document records
+> it in its conclusion (`prior_consultation_required`), and the
+> processing waits on the supervisory authority outside the playbook.
 
 ## 4. Playbook variables
 
-The playbook operates on a small set of workflow-scope variables.
-`__processing_ref__` is external — supplied by the operator at
-lifecycle entry against the processing envelope under
-assessment. The remainder are set by downstream steps as the
-case progresses:
+The contract has 48 variables: 28 adapter inputs, one envelope per
+action step, and the ten names the SKELETON declared, which are now
+fields the adapter extracts from those envelopes.
+`__processing_ref__` is the trigger input.
 
-| Variable                                | External? | Set by                                     | Purpose                                                                                                                                    |
-|-----------------------------------------|-----------|--------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
-| `__processing_ref__`                    | yes       | operator-supplied                          | reference to the processing operation under assessment; joined against the operator's Article 30 record-of-processing-activities inventory |
-| `__dpia_case_id__`                      | no        | `screen_dpia_triggers`                     | correlation key across the ten steps and against the operator's evidence store                                                             |
-| `__dpia_required__`                     | no        | `screen_dpia_triggers`                     | boolean screening verdict against Art. 35(1), Art. 35(3)(a)–(c), and the operator's Art. 35(4) supervisory-authority list                  |
-| `__screening_result_ref__`              | no        | `screen_dpia_triggers`                     | reference to the screening-decision artifact retained on the accountability ledger regardless of the boolean outcome                       |
-| `__processing_description_ref__`        | no        | `gather_processing_description`            | Article 35(7)(a) systematic description (purposes, categories of data and subjects, recipients, retention, transfer legs)                  |
-| `__risk_assessment_ref__`               | no        | `identify_and_assess_risks`                | Article 35(7)(c) risks-to-rights-and-freedoms assessment (per-risk likelihood, severity, and residual-risk profile)                        |
-| `__mitigations_ref__`                   | no        | `identify_and_document_mitigations`        | Article 35(7)(d) safeguards, security measures, and mechanisms; per-risk mitigation attribution                                            |
-| `__dpo_consultation_ref__`              | no        | `dpo_consultation`                         | Article 35(2) DPO advice record (or the operator's alternative-accountability-surface record where no DPO is designated per Art. 37)       |
-| `__article_36_pre_consultation_flag__`  | no        | `determine_article_36_gate`                | Article 36(1) residual-risk verdict against the mitigated risk profile                                                                     |
-| `__dpia_document_ref__`                 | no        | `produce_dpia_document`                    | durable DPIA document artifact for the Article 5(2) accountability posture                                                                 |
-| `__review_cadence__`                    | no        | `schedule_review_cadence`                  | ISO 8601 duration recording the Article 35(11) maximum review interval absent a material processing change                                 |
+| Step | Adapter inputs | Envelope | Extracted fields |
+|------|----------------|----------|------------------|
+| screen_dpia_triggers | `__processing_ref__`, `__screening_answers__`, `__screened_at__` | `__screening__` | `__dpia_case_id__`, `__dpia_required__`, `__screening_result_ref__` |
+| classify_processing_type | `__ropa_entry__`, `__classified_at__` | `__classification__` | — |
+| gather_processing_description | `__description_record__`, `__described_at__` | `__processing_description__` | `__processing_description_ref__` |
+| assess_necessity_and_proportionality | `__necessity_record__`, `__necessity_assessed_at__` | `__necessity_assessment__` | — |
+| identify_and_assess_risks | `__risk_scale__`, `__high_risk_floor__`, `__risk_register__`, `__risks_assessed_at__` | `__risk_assessment__` | `__risk_assessment_ref__` |
+| identify_and_document_mitigations | `__measures__`, `__residual_risks__`, `__mitigations_documented_at__` | `__mitigations__` | `__mitigations_ref__` |
+| dpo_consultation | `__consultation_record__`, `__consulted_at__` | `__dpo_consultation__` | `__dpo_consultation_ref__` |
+| determine_article_36_gate | `__member_state_requires_consultation__`, `__article_36_submission__`, `__determined_at__` | `__article_36_determination__` | `__article_36_pre_consultation_flag__` |
+| produce_dpia_document | `__workflow_id__`, `__execution_id__`, `__document_produced_at__` | `__dpia_document__` | `__dpia_document_ref__` |
+| schedule_review_cadence | `__review_max_interval__`, `__review_change_triggers__`, `__change_management_ref__`, `__review_scheduled_at__` | `__review_schedule__` | `__review_cadence__` |
+
+Every later step also reads the envelopes before it: classification
+reads the screening, the document reads all nine records, and so on,
+as each step's `in_args` lists. Three rules hold at the adapter seam:
+
+- **Lists ride as JSON strings**, because CACAO has no list type:
+  `__risk_scale__`, `__risk_register__`, `__measures__`,
+  `__residual_risks__` and `__review_change_triggers__`. The adapter
+  decodes them before the call.
+- **Unset arrives as `""`** from n8n. `__article_36_submission__` is
+  unset until the controller has consulted the authority, and the
+  primitive treats `""` as unset.
+- **The gate reads a real boolean.** `__dpia_required__` is compared to
+  true, so the string `false`, which is truthy in most runtimes, never
+  reaches it.
 
 The screening-outcome handling is the invariant that pins
 correctness of the whole lifecycle: the screening record is
@@ -396,57 +406,33 @@ target produces byte-identical evidence bytes.
 
 ## 7. Per-target hand-off
 
-### 7.1 n8n — Set nodes over the ten-step lifecycle
+All three targets compile the same bound source. The primitives are
+the logic; what the operator wires is the adapter that supplies the
+inputs in § 4 and stores the envelopes.
+
+### 7.1 n8n — Code nodes over the ten-step lifecycle
 
 `examples/n8n/data_protection_impact_assessment/workflow.n8n.json`
-carries the CACAO topology as n8n nodes (one `manualTrigger`, one
-`set` node per action, one `noOp` terminal). Node ids preserve
-the CACAO step ids verbatim. Each action node emits a
-`n8n-nodes-base.set` carrying the CACAO I/O contract as editable
-assignment rows plus the `x_secops_ng` reference bundles.
+carries the topology as n8n nodes: one `manualTrigger`, ten `code`
+nodes, one `if` node for the screening gate and one `noOp` terminal.
+Node ids preserve the CACAO step ids verbatim. Each Code node imports
+its primitive and binds the step's envelope to the call, for example:
 
-Operators bind the Set rows to their connectors:
+```python
+from content.playbooks.data_protection_impact_assessment.primitives.screening import screen_dpia_triggers
+__screening__ = screen_dpia_triggers(processing_ref=__processing_ref__, screened_at=__screened_at__, screening=__screening_answers__)
+```
 
-- `screen_dpia_triggers` → the operator's screening surface (a
-  Function node against the Article 35(3) trigger set; an
-  HTTP Request node against a compliance-platform screening
-  endpoint; or a Set node when the trigger evaluation is
-  authored inline by the assessor). Writes `__dpia_case_id__`,
-  `__dpia_required__`, `__screening_result_ref__`.
-- `classify_processing_type` → the operator's RoPA-inventory
-  connector (Postgres node against the inventory table; HTTP
-  Request node against the inventory API; or an Airtable /
-  Notion node when the RoPA lives there).
-- `gather_processing_description` → the RoPA-extraction path
-  (Function node materialising the Article 35(7)(a) description
-  against the joined inventory row); writes
-  `__processing_description_ref__`.
-- `assess_necessity_and_proportionality` → the necessity-and-
-  proportionality template (Set node with the reasoning rows,
-  or a Subflow invocation against a shared template).
-- `identify_and_assess_risks` → the operator's risk-taxonomy
-  surface (Function node applying the taxonomy over the
-  description; or an HTTP Request against a shared risk-registry
-  engine); writes `__risk_assessment_ref__`.
-- `identify_and_document_mitigations` → the safeguards catalogue
-  (Set node against the operator's per-control mitigation
-  library); writes `__mitigations_ref__`.
-- `dpo_consultation` → the DPO-consultation channel (Send Email
-  node against the DPO's channel of record; HTTP Request node
-  against the operator's ticketing surface; or a Wait node on a
-  webhook trigger when the DPO responds asynchronously); writes
-  `__dpo_consultation_ref__`.
-- `determine_article_36_gate` → the residual-risk gate (Function
-  node reading the assessment-and-mitigations pair against the
-  operator's Article 36(1) threshold); writes
-  `__article_36_pre_consultation_flag__`.
-- `produce_dpia_document` → the DPIA-document assembler
-  (Function node materialising the durable artifact against the
-  operator's template); writes `__dpia_document_ref__`.
-- `schedule_review_cadence` → the change-management connector
-  (HTTP Request against the operator's change-tracking surface,
-  or a Cron node when the fallback cadence is the primary
-  review path); writes `__review_cadence__`.
+The IF node reads `{{$workflow.variables.dpia_required}}`, the boolean
+the adapter extracts from `__screening__`; its false branch goes to the
+terminal. The compile records no lossy translations.
+
+Operators wire the adapter around the Code nodes: the RoPA connector
+that yields `__ropa_entry__`, the risk-register and measures sources,
+the DPO's channel of record for `__consultation_record__`, the
+submission tracker for `__article_36_submission__`, and the document
+and change-management stores that keep `__dpia_document__` and
+`__review_schedule__`.
 
 To regenerate the compiled workflow artifact from the repo root:
 
@@ -465,43 +451,17 @@ drifts.
 ### 7.2 Temporal — activities over the ten-step lifecycle
 
 `examples/temporal/data_protection_impact_assessment/workflow.temporal.py`
-carries the CACAO topology as a Temporal workflow with one
-activity per action step. `__processing_ref__` is threaded
-through the workflow signature as an argument — the inventory
-join, the Article 35(7) content assembly, and the Article 36
-gate all read from that external playbook-scoped input rather
-than from a worker-local scope. A worker restart mid-workflow
-re-hydrates the same inventory-row scope against Temporal's
-event-history replay contract, so a re-emission of the
-DPIA-evidence artifact produces byte-identical
-`artifact_id` bytes.
+carries one activity per action step, and each activity body calls its
+primitive. The primitives are pure and take every instant as an input,
+never reading a clock, so a history replay re-derives the same
+envelopes. The workflow's `run` method leaves control flow, including
+the screening gate, to the integrator, as it does for every playbook.
 
-Operators bind the activity bodies to real connectors:
-
-- `screen_dpia_triggers` — the screening activity; the
-  reference binding evaluates the Article 35(3) trigger set
-  against the processing envelope and stamps
-  `__dpia_case_id__`.
-- `classify_processing_type` — the RoPA-inventory activity.
-- `gather_processing_description` — the description-assembly
-  activity.
-- `assess_necessity_and_proportionality`,
-  `identify_and_assess_risks`,
-  `identify_and_document_mitigations` — the three assessment
-  activities carrying the Article 35(7)(b)–(d) content.
-- `dpo_consultation` — the DPO-consultation activity. The
-  DPO-side response is typically async; Temporal's signal
-  primitive is the natural fit — the activity waits on a
-  `dpo_advice_received` signal, so an operator's channel of
-  record can post the advice back to the workflow without
-  polling.
-- `determine_article_36_gate` — the residual-risk gate
-  activity.
-- `produce_dpia_document` — the document-assembly activity.
-- `schedule_review_cadence` — the review-scheduler activity.
-  The Article 35(11) change-driven review is typically
-  externalised as a Temporal cron-workflow the operator's
-  change-management surface signals into.
+The DPO's advice is usually asynchronous. Temporal's signal primitive
+fits: the workflow waits on a signal that carries
+`__consultation_record__` before running `dpo_consultation`. The
+Article 35(11) review is typically a separate cron workflow that the
+change-management surface signals into.
 
 To regenerate the compiled artifact from the repo root:
 
@@ -516,36 +476,21 @@ reruns the emitter and fails if the committed artifact drifts.
 ### 7.3 LangGraph — nodes and state over the ten-step lifecycle
 
 `examples/langgraph/data_protection_impact_assessment/graph_spec.json`
-carries the CACAO topology as a target-neutral GraphSpec (nodes,
-edges); `state_bindings.py` emits the `TypedDict` state and the
-`@tool`-decorated action wrappers plus the agentic-extension
-hook. `__processing_ref__` is expressed as a state field
-threaded through node bodies — the RoPA join, the Article 35(7)
-content, and the Article 36 gate all read from state, so a
-checkpoint reload re-hydrates the same assessment scope.
+carries the topology as a target-neutral GraphSpec, with the screening
+gate as a conditional edge; `state_bindings.py` emits the `TypedDict`
+state and one `@tool` per action step whose body calls the primitive.
+Inputs and envelopes are state fields, so a checkpoint reload
+re-hydrates the same assessment.
 
 The audit-mirror sibling `_audit_mirror.py` (see
 [`docs/observability/audit-mirror.md`](../observability/audit-mirror.md))
 carries the OTel-free durable audit trail on LangGraph runs
 where the operator has not wired an OTLP collector.
 
-Operators bind the tool bodies to real connectors:
-
-- `screen_dpia_triggers` → screening surface tool.
-- `classify_processing_type`,
-  `gather_processing_description`,
-  `assess_necessity_and_proportionality`,
-  `identify_and_assess_risks`,
-  `identify_and_document_mitigations` — one tool per
-  assessment step against the operator's substrate.
-- `dpo_consultation` → DPO-consultation tool + optional
-  agentic-extension hook. The agentic-extension surface is
-  where the operator's LangGraph agent can pause the graph on
-  the DPO's asynchronous review and resume on the
-  advice-received signal.
-- `determine_article_36_gate` → residual-risk gate tool.
-- `produce_dpia_document` → DPIA-document assembler tool.
-- `schedule_review_cadence` → review-scheduler tool.
+The agentic-extension hook is where an operator's agent can pause the
+graph on the DPO's review and resume when the advice arrives. The
+primitives stay deterministic either way: the agent supplies
+`__consultation_record__`, it does not decide the outcome.
 
 To regenerate the compiled artifacts from the repo root:
 
