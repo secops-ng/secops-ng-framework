@@ -32,10 +32,14 @@ The canonical input is the CACAO v2 playbook at
 `../../../content/playbooks/network_security/playbook.cacao.yaml`.
 The emitter splits into two artifacts: a declarative `GraphSpec` JSON
 (nodes, edges, conditional-edge routers) and a generated Python module
-carrying the state schema and per-step tool stubs. `assemble.py` wires
-the two into a `langgraph.graph.StateGraph`; integrators copy this
-file into their runtime and replace each `NotImplementedError` stub in
-`state_bindings.py` with their own tool implementations.
+carrying the state schema and one tool per step, each calling its
+deterministic primitive under `content/playbooks/network_security/primitives/`.
+`assemble.py` wires the two into a `langgraph.graph.StateGraph`;
+integrators copy this file into their runtime and supply the adapter
+inputs the tools read (inventory sources, policy, observations, boundary
+rules, remediation binding and dispatches, step instants). The one
+`NotImplementedError` left in `state_bindings.py` is the optional
+`llm_step` hook, which picks no LLM SDK on the integrator's behalf.
 
 ## How to regenerate
 
