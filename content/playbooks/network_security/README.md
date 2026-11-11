@@ -1,7 +1,7 @@
 # network_security — NIS2 Art. 21(2)(e) / DORA Art. 9 network-boundary reconciliation
 
-SKELETON tier of the F-WF-NETWORK-SECURITY trilogy. This playbook is
-the operator-side per-window reconciliation of the declared
+`stable` playbook of the F-WF-NETWORK-SECURITY trilogy. It is the
+operator-side per-window reconciliation of the declared
 segmentation policy against the observed network posture on the
 operator's own deployed estate: enumerate the documented network
 segments, evaluate the segmentation-policy allowances against the
@@ -36,11 +36,11 @@ window.
 
 ## Files
 
-- `playbook.cacao.yaml` — CACAO v2 workflow scaffold (5 steps:
+- `playbook.cacao.yaml` — the CACAO v2 workflow (5 steps:
   inventory-network-segments → evaluate-segmentation-policy →
   detect-policy-violations → enforce-remediation →
-  generate-posture-evidence-artifact). SKELETON: action bodies are
-  `TODO` markers a sibling CORE card lands.
+  generate-posture-evidence-artifact), each step bound to its
+  primitive through `core_body`.
 - `mappings.yaml` — outbound view of the content model: OSCAL
   (SC-7 / SC-3 / CA-9), D3FEND (D3-NTA + D3-ISVA on the detect step
   with per-step gap notes), OCSF (Network Activity 4001), and the
@@ -52,9 +52,14 @@ window.
 
 ## Status
 
-`maturity: experimental`, CORE-PRIM complete. Each of the five action
-steps has a deterministic primitive under `primitives/`, executed
-directly by `tests/playbooks/network_security/test_primitives.py`.
+`maturity: stable`, `content_version` 1.0.0. All five action steps
+bind a deterministic primitive under `primitives/` through `core_body`,
+each executed directly by
+`tests/playbooks/network_security/test_primitives.py`, and the three
+reference targets emit those calls. The graduation checklist
+recomputes green: tier A, 5 of 5 real bindings, zero placeholder
+bodies, zero blank predicates, zero schema errors, zero predicted n8n
+TODOs.
 
 | Step | Primitive |
 |---|---|
@@ -101,14 +106,35 @@ Decisions the primitives fix:
   violation and evidence identifiers are digests of content, never of
   the clock.
 
-Owed: the wire. The five steps are not yet bound through `core_body`,
-and the playbook stays `experimental` until they are.
+The wire binds them:
+
+- **The topology stays linear.** `enforce_remediation` runs on every
+  window. With an empty violation set it dispatches nothing and leaves
+  `__remediation_action_id__` unset, and the evidence step records
+  `no_findings`.
+- **The contract grows from 6 to 23 variables.** There are 13 adapter
+  inputs: the reconciliation window, the inventory sources in
+  precedence order, the segmentation policy, the observed transits and
+  the boundary rules, the remediation binding, whether automated
+  isolation is allowed, the dispatch receipts, and the five step
+  instants. There is one envelope per step. The five identifiers the
+  SKELETON declared are now fields extracted from those envelopes at
+  the adapter seam; `__reconciliation_window__` stays the trigger
+  input.
+- **Lists ride as JSON strings**, because CACAO has no list type: the
+  inventory sources, the observed transits, the boundary rules and the
+  dispatches. `__remediation_binding__` defaults to `DEFAULT_BINDING`,
+  carried as JSON text in the variable's `value`, which the adapter
+  decodes like the lists.
+- **Isolation needs a real boolean.** `__automated_isolation_allowed__`
+  has no default, so the operator states its isolation posture
+  explicitly every run.
 
 ## Operator-supplied bindings
 
 The playbook operationalises a documented posture; it does not
-author the segmentation architecture. Operators supply the
-following bindings at the CORE tier:
+author the segmentation architecture. These operator surfaces feed
+the adapter inputs above:
 
 | Binding | Sourced from |
 |---------|--------------|
@@ -120,8 +146,8 @@ following bindings at the CORE tier:
 
 ## Trilogy
 
-- **SKELETON (this card):** scaffold + mappings + inbound wires.
-- **CORE:** full workflow logic — deterministic per-step
+- **SKELETON:** scaffold + mappings + inbound wires.
+- **CORE (CORE-PRIM #1063, CORE-WIRE + GRADUATE this change):** full workflow logic — deterministic per-step
   primitives (segment-inventory reconciliation, policy-evaluation
   algebra, violation-classification, remediation-dispatch adapter
   Protocols), per-target compiler emissions (n8n / Temporal /
