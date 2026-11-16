@@ -146,6 +146,24 @@ ocsf:
       EXTEND wires the Compliance Finding (2003) emit binding for
       missed-milestone deviations if scoped.
 
+  - id: telemetry.ocsf.incident_finding@v1
+    category_uid: 2
+    category_name: Findings
+    class_uid: 2005
+    class_name: Incident Finding
+    ocsf_version: "1.3.0"
+    direction: emits
+    notes: >-
+      Emitted at each of the three notification steps when the
+      milestone falls due and when it is submitted, and at
+      close-and-archive. The SLA-compliance KPI and the
+      regulator-notification overrun KRI read the notification
+      events against each milestone's due_at; the
+      timeline-completeness KPI reads the archive. Declared on the
+      playbook root and on those four steps' telemetry_refs, next
+      to their metric_refs. Schema:
+      https://schema.ocsf.io/1.3.0/classes/incident_finding
+
 nis2:
   # Cross-regime NIS2 Art. 23 sibling: the operator submitting a DORA
   # Art. 19 notification chain is very likely also in scope of NIS2

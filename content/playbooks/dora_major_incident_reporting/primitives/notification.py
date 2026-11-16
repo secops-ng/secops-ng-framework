@@ -77,6 +77,10 @@ class InvalidReportingError(ValueError):
     """Inputs are malformed, out of order, or the incident is not major."""
 
 
+# What each notification measures: whether it met its Art. 19(4) deadline (the SLA KPI) and, read the
+# other way, whether it overran it (the regulator-notification KRI). A subset of the step's metric_refs.
+_METRIC_STAMPS = ("kpi.notification_sla_compliance@v1", "kri.regulator_notification_overrun@v1")
+
 def _major(classification: object) -> dict:
     needed = {"classification_id", "incident_id", "classified_at", "major", "reasons", "rule_ids",
               "recurring_incident"}
@@ -163,7 +167,8 @@ def _compose(variant: str, classification: dict, reporting_window: str, aware_at
         report = render_dora_art19_report(context)
     except (DoraArt19EmitError, TypeError) as exc:
         raise InvalidReportingError(str(exc)) from exc
-    return {"report": report, "due_at": text(due), "within_deadline": submitted <= due, "deadline_basis": basis}
+    return {"report": report, "due_at": text(due), "within_deadline": submitted <= due, "deadline_basis": basis,
+            "metric_stamps": list(_METRIC_STAMPS)}
 
 
 def compose_initial_notification(classification: dict, reporting_window: str, aware_at: str, submitted_at: str,

@@ -143,7 +143,7 @@ _48 playbooks — 36 stable / 12 experimental. `stable` is the Maturity ladder's
 
 | Playbook | Maturity | What it does |
 |---|---|---|
-| [`data_protection_impact_assessment`](data_protection_impact_assessment/) | `experimental` | CACAO v2 scaffold for the operator-side data protection impact assessment (DPIA) lifecycle a controller runs before deploying processing… |
+| [`data_protection_impact_assessment`](data_protection_impact_assessment/) | `stable` | CACAO v2 playbook for the operator-side data protection impact assessment (DPIA) lifecycle a controller runs before deploying processing… |
 | [`data_subject_rights`](data_subject_rights/) | `stable` | CACAO v2 playbook for the operator-side data subject rights (DSR) intake and fulfilment lifecycle a controller runs when a data subject e… |
 
 ### SOC operations & programme

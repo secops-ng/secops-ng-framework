@@ -183,6 +183,12 @@ def _action_without_commands_steps() -> dict[str, dict]:
     rendering the primitive call (CORE-MECH-EMIT-N8N) rather than the
     Set-node uplift that surfaces the CACAO contract verbatim — the
     primitive call is the contract.
+
+    Since the CORE-WIRE change all ten action steps are bound, so this
+    returns ``{}`` and the Set-node tests that consume it are vacuous here.
+    They are kept rather than deleted: they are the contract that catches a
+    step being unbound again, and they start asserting the moment one is.
+    The live check for the bound steps is ``test_core_body_steps_emit_code_nodes``.
     """
     raw = json.loads(MIRRORED_CACAO.read_text(encoding="utf-8"))
     return {
@@ -213,13 +219,10 @@ def test_core_body_steps_emit_code_nodes() -> None:
     rendering the primitive call (per CORE-MECH-EMIT-N8N)."""
     nodes_by_id = _nodes_by_id()
     core_steps = _core_body_steps()
-    # Unbound today: its CORE-WIRE is a F-WF-CORE-WAVE-2 item. The count is
-    # asserted rather than returning early on an empty selection, so the
-    # wire has to update it deliberately and a broken selector cannot pass
-    # vacuously (#1038).
-    assert len(core_steps) == 0, (
-        f"{len(core_steps)} bound steps found: update this count when the playbook is wired"
-    )
+    # All ten action steps are bound since the CORE-WIRE change. The count is
+    # asserted rather than trusting the selection, so a broken selector
+    # cannot pass vacuously (#1038).
+    assert len(core_steps) == 10, f"expected all ten action steps bound, found {len(core_steps)}"
     for step_id, step in core_steps.items():
         node = nodes_by_id[step_id]
         assert node["type"] == "n8n-nodes-base.code", (
@@ -239,6 +242,23 @@ def test_core_body_steps_emit_code_nodes() -> None:
             f"`{out_var} = {callable_name}(...)`"
         )
 
+
+
+def test_the_screening_gate_reads_the_extracted_boolean() -> None:
+    """The one if-condition compiles to an n8n IF node on __dpia_required__,
+    the real boolean extracted from the screening envelope, and its false
+    branch ends the lifecycle."""
+    raw = json.loads(MIRRORED_CACAO.read_text(encoding="utf-8"))
+    nodes_by_id = _nodes_by_id()
+    gates = {sid: s for sid, s in raw["workflow"].items() if s["type"] == "if-condition"}
+    assert [g["condition"] for g in gates.values()] == ["__dpia_required__"]
+    for step_id, gate in gates.items():
+        assert raw["workflow"][gate["on_false"]]["type"] == "end", "a negative screening must end the lifecycle"
+        node = nodes_by_id[step_id]
+        assert node["type"] == "n8n-nodes-base.if", f"{step_id}: {node['type']}"
+        # n8n workflow variables drop the CACAO double underscores.
+        left = node["parameters"]["conditions"]["conditions"][0]["leftValue"]
+        assert left == "{{$workflow.variables.dpia_required}}", f"{step_id}: IF node reads {left}"
 
 def test_action_without_commands_steps_emit_set_nodes() -> None:
     """No `noOp` placeholders left for steps that should carry intent."""

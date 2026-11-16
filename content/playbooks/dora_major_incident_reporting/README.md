@@ -156,8 +156,25 @@ Choices settled at the wire:
   context), one envelope per step, the gate boolean, and the five
   existing identifiers, now extracted from the envelopes.
 
-Submission-adapter and authority-channel bindings, and the per-cycle
-KPIs, remain EXTEND work.
+**Per-cycle metrics.** The playbook declares the three metrics its
+lifecycle produces, at the root and on the steps that produce them, and
+each primitive returns `metric_stamps`, a subset of its step's
+`metric_refs`:
+
+- the three notification steps measure
+  `kpi.notification_sla_compliance@v1` and
+  `kri.regulator_notification_overrun@v1` from each milestone's
+  `within_deadline` against its Art. 5 `due_at`;
+- close-and-archive measures `kpi.timeline_completeness@v1`: it closes
+  the cycle on both branches, so the record is complete or the
+  primitive refuses it.
+
+Those four steps, and the playbook root, carry
+`telemetry.ocsf.incident_finding@v1`, the OCSF class the three metrics
+read. Classification measures nothing.
+
+Submission-adapter and authority-channel bindings remain operator-bound
+by design.
 
 ## Steps
 
