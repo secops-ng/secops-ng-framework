@@ -100,4 +100,7 @@ def compose_cycle_archive(classification: dict, initial: dict | str | None, inte
         "workflow_id": wid,
         "execution_id": eid,
         "captured_at": captured_at,
+        # The archive closes the cycle on both branches, so the record is complete or this primitive
+        # refused it: the timeline-completeness KPI is measured here.
+        "metric_stamps": ["kpi.timeline_completeness@v1"],
     }

@@ -217,6 +217,14 @@ submission) and the OCSF telemetry class each step reads or emits.
 | `…000006`   | close_and_archive                   | compose the dated cycle-archival record referencing the classification decision, the three submissions, the authority acknowledgements, and any cross-regime parallel-notification chains; set `__cycle_archive_id__`                                                   | adapter-bound  |
 | `…000007`   | dora_major_incident_reporting_end   | edge wiring only — no body                                                                                                                                                                                                                                          | n/a            |
 
+**Metrics.** The three notification steps stamp
+`kpi.notification_sla_compliance@v1` and
+`kri.regulator_notification_overrun@v1`, read from each milestone's
+`within_deadline` against its Delegated Regulation (EU) 2025/301 Art. 5
+deadline; `close_and_archive` stamps `kpi.timeline_completeness@v1`.
+Each primitive returns them as `metric_stamps`, a subset of its step's
+`metric_refs`, and those steps carry `telemetry.ocsf.incident_finding@v1`.
+
 Sequencing is `on_completion` between the action steps, with one
 branch: the `major_incident_gate` `if-condition` after
 `detect_and_classify`. A **not-major** classification takes the false
