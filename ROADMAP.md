@@ -2526,6 +2526,15 @@ one playbook's provenance.
     consent, and one checked evidence chain per window; the playbook's
     RTS citation corrected to Delegated Regulation (EU) 2024/1774
     Art. 13).
+  - CORE-WIRE + GRADUATE — #1067, closing #1064 (`data_protection_impact_assessment`:
+    all ten action steps bound through `core_body`, each carrying its
+    `secops-ng-primitive` command in place of the manual one; an
+    if-condition on `__dpia_required__` ends the lifecycle on a negative
+    screening, which classification would otherwise refuse at step two;
+    the contract grows from 11 to 48 variables, with lists riding as JSON
+    strings; three targets regenerated from the YAML source;
+    `experimental` → `stable`, `content_version` 1.0.0 on a recomputed
+    checklist).
 
 ## Epic PT — Pattern Library
 

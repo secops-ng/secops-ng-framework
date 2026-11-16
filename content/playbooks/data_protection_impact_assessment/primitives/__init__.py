@@ -6,7 +6,6 @@ step of the GDPR Art. 35 assessment. Every rule was checked against
 Regulation (EU) 2016/679 on EUR-Lex and, where the Regulation leaves the
 method open, against the WP248 rev.01 guidelines the EDPB endorsed.
 
-
 * :mod:`.screening` — :func:`screen_dpia_triggers` (screen_dpia_triggers).
   Art. 35(10), similar-assessment coverage, Art. 35(3), the Art. 35(4) and
   35(5) lists and the WP248 two-criteria rule, in that order; a negative
@@ -24,7 +23,6 @@ method open, against the WP248 rev.01 guidelines the EDPB endorsed.
 * :mod:`.risk` — :func:`assess_risks` (identify_and_assess_risks).
   Art. 35(7)(c): sources, threats, impacts, likelihood and severity per
   risk, all three reference events covered, on the operator's calibration.
-
 * :mod:`.mitigations` — :func:`document_mitigations`
   (identify_and_document_mitigations). Art. 35(7)(d): measures against the
   assessed risks, and the residual level of each, never above the assessed

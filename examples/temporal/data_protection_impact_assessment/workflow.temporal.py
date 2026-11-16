@@ -20,485 +20,255 @@ _TRACER = trace.get_tracer(__name__)
 from ._audit_mirror import AuditRecord, AuditTrail
 
 @activity.defn
-async def screen_dpia_triggers(processing_ref: str) -> dict[str, object]:
-    """SKELETON — screen __processing_ref__ against the Article 35(3)(a-c) mandatory-DPIA triggers (systematic and extensive evaluation of personal aspects based on automated processing; large-scale processing of special categories of data or personal data relating to criminal convictions and offences; systematic monitoring of a publicly accessible area on a large scale), against the operator's supervisory-authority Article 35(4) list of processing kinds that require a DPIA in the operator's jurisdiction, and against the general Article 35(1) likely-to-result-in-a-high-risk test taking into account the nature, scope, context and purposes of the processing. Assigns __dpia_case_id__, sets __dpia_required__, and records __screening_result_ref__ on the accountability ledger. A false outcome short- circuits the lifecycle with the negative screening retained as part of the operator's Article 5(2) accountability record. TODO (CORE): pin the operator's supervisory-authority Article 35(4) list adapter and the novel-technology signal (WP248 rev.01 criteria).
+async def screen_dpia_triggers(processing_ref: str, screening_answers: dict[str, object], screened_at: str) -> dict[str, object]:
+    """Decide whether a DPIA is required for __processing_ref__. The first rule that applies wins: the Article 35(10) exemption, unless the Member State requires a prior DPIA; an existing assessment of similar processing (Article 35(1), last sentence); the Article 35(3) cases; the supervisory authority's Article 35(4) and 35(5) lists; and the WP248 rev.01 rule that two or more criteria call for a DPIA unless the controller documents a justification and, where a DPO is designated, the DPO's views. The controller may always elect a DPIA. A negative screening is retained on the accountability ledger with its basis. Produces __screening__, from which __dpia_case_id__, __dpia_required__ and __screening_result_ref__ are extracted.
 
     CACAO step_id: action--d91a35c0-0000-4000-8000-000000000002
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--d91a35c0-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000002', 'secops_ng.step.name': 'screen_dpia_triggers', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'screen_dpia_triggers'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000002', 'secops_ng.step.name': 'screen_dpia_triggers', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'screen_dpia_triggers'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--d91a35c0-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000002', 'secops_ng.step.name': 'screen_dpia_triggers', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'screen_dpia_triggers'})
+            AuditRecord(span_name='activity.action--d91a35c0-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000002', 'secops_ng.step.name': 'screen_dpia_triggers', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'screen_dpia_triggers'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--d91a35c0-0000-4000-8000-000000000002'"
-        )
+        from content.playbooks.data_protection_impact_assessment.primitives.screening import screen_dpia_triggers
+        __screening__ = screen_dpia_triggers(processing_ref=__processing_ref__, screened_at=__screened_at__, screening=__screening_answers__)
 
 SCREEN_DPIA_TRIGGERS_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def classify_processing_type(dpia_case_id: str, processing_ref: str) -> None:
-    """SKELETON — classify the processing envelope against the operator's processing-inventory surface (the Article 30 record of processing activities as canonical join key) so downstream steps read a common shape: personal-data categories, special-category involvement, subject categories (including vulnerable-subject axes such as children, employees, patients), controller-vs-processor role, and the lawful-basis attribution the processing relies on under Article 6 (and where applicable Article 9(2)). Anchors the assessment scope; does not itself perform the risk determination. TODO (CORE): pin the RoPA-inventory adapter and the vulnerable-subject axis catalogue.
+async def classify_processing_type(screening: dict[str, object], ropa_entry: dict[str, object], classified_at: str) -> dict[str, object]:
+    """Classify the processing from its Article 30 record into the shape every later step reads: data and subject categories, special categories, criminal-offence data, vulnerable subjects in the WP248 criterion 7 vocabulary, the controller role and the lawful bases. The DPIA is the controller's, so a record held in the processor role is refused. Lawfulness gaps under Articles 6, 9(2) and 10 are recorded, not decided away. A screening that does not require a DPIA is refused, which is why the gate sits before this step. Produces __classification__.
 
     CACAO step_id: action--d91a35c0-0000-4000-8000-000000000003
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--d91a35c0-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000003', 'secops_ng.step.name': 'classify_processing_type', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_processing_type'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000003', 'secops_ng.step.name': 'classify_processing_type', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_processing_type'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--d91a35c0-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000003', 'secops_ng.step.name': 'classify_processing_type', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_processing_type'})
+            AuditRecord(span_name='activity.action--d91a35c0-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000003', 'secops_ng.step.name': 'classify_processing_type', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'classify_processing_type'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--d91a35c0-0000-4000-8000-000000000003'"
-        )
+        from content.playbooks.data_protection_impact_assessment.primitives.classification import classify_processing
+        __classification__ = classify_processing(classified_at=__classified_at__, ropa_entry=__ropa_entry__, screening=__screening__)
 
 CLASSIFY_PROCESSING_TYPE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def gather_processing_description(dpia_case_id: str, processing_ref: str) -> str:
-    """SKELETON — assemble the systematic description of the envisaged processing operations and their purposes per Article 35(7)(a): purposes of the processing, categories of personal data and of data subjects, recipients or categories of recipients (including any transfers to third countries or international organisations), envisaged retention periods or the criteria used to determine them, and where applicable the legitimate interests pursued by the controller. Records __processing_description_ref__ so downstream steps read a stable description surface. TODO (CORE): pin the RoPA-extraction adapter and the transfer-legs cross-reference.
+async def gather_processing_description(classification: dict[str, object], description_record: dict[str, object], described_at: str) -> dict[str, object]:
+    """Assemble the Article 35(7)(a) systematic description: purposes and, where Article 6(1)(f) is relied on, the legitimate interest; recipients and third-country transfers with their Chapter V basis; retention per data category; and the assets the data rely on, as WP248 rev.01 Annex 2 lists them. Missing elements are recorded as gaps rather than refused. Produces __processing_description__, from which __processing_description_ref__ is extracted.
 
     CACAO step_id: action--d91a35c0-0000-4000-8000-000000000004
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--d91a35c0-0000-4000-8000-000000000004',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000004', 'secops_ng.step.name': 'gather_processing_description', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'gather_processing_description'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000004', 'secops_ng.step.name': 'gather_processing_description', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'gather_processing_description'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--d91a35c0-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000004', 'secops_ng.step.name': 'gather_processing_description', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'gather_processing_description'})
+            AuditRecord(span_name='activity.action--d91a35c0-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000004', 'secops_ng.step.name': 'gather_processing_description', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'gather_processing_description'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--d91a35c0-0000-4000-8000-000000000004'"
-        )
+        from content.playbooks.data_protection_impact_assessment.primitives.description import compose_processing_description
+        __processing_description__ = compose_processing_description(classification=__classification__, described_at=__described_at__, description=__description_record__)
 
 GATHER_PROCESSING_DESCRIPTION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def assess_necessity_and_proportionality(dpia_case_id: str, processing_description_ref: str) -> None:
-    """SKELETON — assess the necessity and proportionality of the processing operations in relation to the purposes per Article 35(7)(b). Necessity: whether the processing is required to achieve the purpose or whether a less- intrusive alternative would suffice. Proportionality: whether the categories of data and the scope of the processing are commensurate with the purpose and not excessive. Records the reasoning on the case; the outcome feeds the risk assessment and the mitigations identification downstream. TODO (CORE): pin the necessity-and-proportionality assessment template.
+async def assess_necessity_and_proportionality(classification: dict[str, object], processing_description: dict[str, object], necessity_record: dict[str, object], necessity_assessed_at: str) -> dict[str, object]:
+    """Assess necessity and proportionality under Article 35(7)(b). A less intrusive alternative that suffices defeats necessity; every classified data category is checked for minimisation (Article 5(1)(c)) and storage limitation (Article 5(1)(e)); lawfulness gaps and the rights measures not yet in place are listed as owed. The outcome feeds the risk assessment and the document; it does not stop the assessment. Produces __necessity_assessment__.
 
     CACAO step_id: action--d91a35c0-0000-4000-8000-000000000005
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--d91a35c0-0000-4000-8000-000000000005',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000005', 'secops_ng.step.name': 'assess_necessity_and_proportionality', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_necessity_and_proportionality'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000005', 'secops_ng.step.name': 'assess_necessity_and_proportionality', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_necessity_and_proportionality'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--d91a35c0-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000005', 'secops_ng.step.name': 'assess_necessity_and_proportionality', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_necessity_and_proportionality'})
+            AuditRecord(span_name='activity.action--d91a35c0-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000005', 'secops_ng.step.name': 'assess_necessity_and_proportionality', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'assess_necessity_and_proportionality'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--d91a35c0-0000-4000-8000-000000000005'"
-        )
+        from content.playbooks.data_protection_impact_assessment.primitives.necessity import assess_necessity_and_proportionality
+        __necessity_assessment__ = assess_necessity_and_proportionality(assessed_at=__necessity_assessed_at__, assessment=__necessity_record__, classification=__classification__, description=__processing_description__)
 
 ASSESS_NECESSITY_AND_PROPORTIONALITY_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def identify_and_assess_risks(dpia_case_id: str, processing_description_ref: str) -> str:
-    """SKELETON — identify and assess the risks to the rights and freedoms of natural persons the processing generates per Article 35(7)(c). Applies the operator's declared risk taxonomy over the risk-source, risk- event, and impact axes (illegitimate access, unauthorised modification, disappearance of personal data — the three EDPB reference risk categories — plus operator-declared context-specific axes). Records per-risk likelihood and severity and the residual-risk profile that determine_article_36_gate reads downstream. Records __risk_assessment_ref__. TODO (CORE): pin the risk-taxonomy binding and the residual- risk calibration surface.
+async def identify_and_assess_risks(necessity_assessment: dict[str, object], risk_scale: str, high_risk_floor: dict[str, object], risk_register: str, risks_assessed_at: str) -> dict[str, object]:
+    """Assess the risks to data subjects under Article 35(7)(c). Every risk names its sources, threats and impacts, with likelihood and severity on the operator's scale; a risk is high when both reach the operator's floor. Each of the three reference events (illegitimate access, undesired modification, disappearance) must be covered, or the event not assessed is named. Produces __risk_assessment__, from which __risk_assessment_ref__ is extracted.
 
     CACAO step_id: action--d91a35c0-0000-4000-8000-000000000006
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--d91a35c0-0000-4000-8000-000000000006',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000006', 'secops_ng.step.name': 'identify_and_assess_risks', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'identify_and_assess_risks'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000006', 'secops_ng.step.name': 'identify_and_assess_risks', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'identify_and_assess_risks'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--d91a35c0-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000006', 'secops_ng.step.name': 'identify_and_assess_risks', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'identify_and_assess_risks'})
+            AuditRecord(span_name='activity.action--d91a35c0-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000006', 'secops_ng.step.name': 'identify_and_assess_risks', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'identify_and_assess_risks'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--d91a35c0-0000-4000-8000-000000000006'"
-        )
+        from content.playbooks.data_protection_impact_assessment.primitives.risk import assess_risks
+        __risk_assessment__ = assess_risks(assessed_at=__risks_assessed_at__, high_risk_floor=__high_risk_floor__, necessity=__necessity_assessment__, risks=__risk_register__, scale=__risk_scale__)
 
 IDENTIFY_AND_ASSESS_RISKS_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def identify_and_document_mitigations(dpia_case_id: str, risk_assessment_ref: str) -> str:
-    """SKELETON — identify and document the measures envisaged to address the risks per Article 35(7)(d): safeguards, security measures, and mechanisms to ensure the protection of personal data and demonstrate compliance with the Regulation, taking into account the rights and legitimate interests of data subjects and other persons concerned. Records __mitigations_ref__ and pins the per-risk mitigation attribution so determine_article_36_gate can read the residual risk after mitigation. TODO (CORE): pin the safeguards catalogue and the security-measure control-reference binding.
+async def identify_and_document_mitigations(risk_assessment: dict[str, object], measures: str, residual_risks: str, mitigations_documented_at: str) -> dict[str, object]:
+    """Record the Article 35(7)(d) measures against the assessed risks and the residual level of every risk after them. A residual level above the assessed one is refused; a high risk no measure addresses is a gap. The residual levels are what the Article 36 gate reads. Produces __mitigations__, from which __mitigations_ref__ is extracted.
 
     CACAO step_id: action--d91a35c0-0000-4000-8000-000000000007
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--d91a35c0-0000-4000-8000-000000000007',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000007', 'secops_ng.step.name': 'identify_and_document_mitigations', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'identify_and_document_mitigations'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000007', 'secops_ng.step.name': 'identify_and_document_mitigations', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'identify_and_document_mitigations'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--d91a35c0-0000-4000-8000-000000000007', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000007', 'secops_ng.step.name': 'identify_and_document_mitigations', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'identify_and_document_mitigations'})
+            AuditRecord(span_name='activity.action--d91a35c0-0000-4000-8000-000000000007', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000007', 'secops_ng.step.name': 'identify_and_document_mitigations', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'identify_and_document_mitigations'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--d91a35c0-0000-4000-8000-000000000007'"
-        )
+        from content.playbooks.data_protection_impact_assessment.primitives.mitigations import document_mitigations
+        __mitigations__ = document_mitigations(documented_at=__mitigations_documented_at__, measures=__measures__, residual_risks=__residual_risks__, risk_assessment=__risk_assessment__)
 
 IDENTIFY_AND_DOCUMENT_MITIGATIONS_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def dpo_consultation(dpia_case_id: str, processing_description_ref: str, risk_assessment_ref: str, mitigations_ref: str) -> str:
-    """SKELETON — seek the advice of the Data Protection Officer where the controller has designated one, per Article 35(2). The DPO reviews the assembled description, necessity-and-proportionality assessment, risk assessment, and mitigations documentation and records advice on the DPIA case. Where the controller has not designated a DPO because Article 37 does not require it, the record documents that fact and the alternative accountability surface the controller relies on. Records __dpo_consultation_ref__. TODO (CORE): pin the DPO-consultation intake adapter and the alternative-accountability-surface record where no DPO is designated.
+async def dpo_consultation(mitigations: dict[str, object], consultation_record: dict[str, object], consulted_at: str) -> dict[str, object]:
+    """Record the DPO's advice under Article 35(2), or the alternative accountability surface where no DPO is designated, and the Article 35(9) views of data subjects. A departure from the advice or from the views needs its documented reasons, and a decision not to seek the views needs a justification. Anything missing is a gap. Produces __dpo_consultation__, from which __dpo_consultation_ref__ is extracted.
 
     CACAO step_id: action--d91a35c0-0000-4000-8000-000000000008
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--d91a35c0-0000-4000-8000-000000000008',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000008', 'secops_ng.step.name': 'dpo_consultation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'dpo_consultation'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000008', 'secops_ng.step.name': 'dpo_consultation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'dpo_consultation'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--d91a35c0-0000-4000-8000-000000000008', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000008', 'secops_ng.step.name': 'dpo_consultation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'dpo_consultation'})
+            AuditRecord(span_name='activity.action--d91a35c0-0000-4000-8000-000000000008', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000008', 'secops_ng.step.name': 'dpo_consultation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'dpo_consultation'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--d91a35c0-0000-4000-8000-000000000008'"
-        )
+        from content.playbooks.data_protection_impact_assessment.primitives.consultation import record_dpo_consultation
+        __dpo_consultation__ = record_dpo_consultation(consultation=__consultation_record__, consulted_at=__consulted_at__, mitigations=__mitigations__)
 
 DPO_CONSULTATION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def determine_article_36_gate(dpia_case_id: str, risk_assessment_ref: str, mitigations_ref: str) -> bool:
-    """SKELETON — determine whether the residual risk, absent measures taken by the controller to mitigate it, would result in a high risk under Article 36(1) and therefore triggers prior consultation with the supervisory authority before the processing may begin. Reads the risk assessment against the applied mitigations and sets __article_36_pre_consultation_flag__. Where the flag is true, the controller must consult the supervisory authority under Article 36(1) and the processing may not begin until the consultation window completes (Article 36(2): up to eight weeks, extendable by six weeks taking into account the complexity of the intended processing). TODO (CORE): pin the supervisory- authority pre-consultation submission chain and the Article 36(2) consultation-window gate.
+async def determine_article_36_gate(mitigations: dict[str, object], member_state_requires_consultation: bool, article_36_submission: dict[str, object], determined_at: str) -> dict[str, object]:
+    """Set the Article 36(1) prior-consultation flag on the residual risk, as WP248 rev.01 section III.E reads it, or because Member State law requires consultation under Article 36(5). Once the authority has received the request, record the nominal Article 36(2) windows: written advice within eight weeks, extendable by six, with the extension notified within one month. Produces __article_36_determination__, from which __article_36_pre_consultation_flag__ is extracted.
 
     CACAO step_id: action--d91a35c0-0000-4000-8000-000000000009
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--d91a35c0-0000-4000-8000-000000000009',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000009', 'secops_ng.step.name': 'determine_article_36_gate', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'determine_article_36_gate'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000009', 'secops_ng.step.name': 'determine_article_36_gate', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'determine_article_36_gate'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--d91a35c0-0000-4000-8000-000000000009', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000009', 'secops_ng.step.name': 'determine_article_36_gate', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'determine_article_36_gate'})
+            AuditRecord(span_name='activity.action--d91a35c0-0000-4000-8000-000000000009', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-000000000009', 'secops_ng.step.name': 'determine_article_36_gate', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'determine_article_36_gate'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--d91a35c0-0000-4000-8000-000000000009'"
-        )
+        from content.playbooks.data_protection_impact_assessment.primitives.prior_consultation import determine_prior_consultation
+        __article_36_determination__ = determine_prior_consultation(determined_at=__determined_at__, member_state_requires_consultation=__member_state_requires_consultation__, mitigations=__mitigations__, submission=__article_36_submission__)
 
 DETERMINE_ARTICLE_36_GATE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def produce_dpia_document(dpia_case_id: str, processing_description_ref: str, risk_assessment_ref: str, mitigations_ref: str, dpo_consultation_ref: str, article_36_pre_consultation_flag: bool) -> str:
-    """SKELETON — produce the durable DPIA document artifact for the case. Assembles the Article 35(7)(a)-(d) content (systematic description, necessity-and- proportionality, risk assessment, mitigations), the Article 35(2) DPO advice, the Article 36 gate outcome, and the review-cadence schedule into the operator's declared DPIA-document template. Records __dpia_document_ref__ on the accountability ledger. The document is the primary response to any subsequent Article 58(1)(a) supervisory-authority information order and the operator's Article 5(2) accountability artifact for this processing envelope. TODO (CORE): pin the DPIA-document template and the evidence-store binding.
+async def produce_dpia_document(screening: dict[str, object], classification: dict[str, object], processing_description: dict[str, object], necessity_assessment: dict[str, object], risk_assessment: dict[str, object], mitigations: dict[str, object], dpo_consultation: dict[str, object], article_36_determination: dict[str, object], workflow_id: str, execution_id: str, document_produced_at: str) -> dict[str, object]:
+    """Join the nine step records of the case into the DPIA document, refusing records from another case or chain. The document is final only when nothing is left open: description gaps, measures owed, reference events not assessed, untreated high risks and consultation gaps keep it a draft. The conclusion is the first that applies: do_not_proceed, prior_consultation_required, may_proceed. It is the Article 5(2) accountability artifact and the answer to an Article 58(1)(a) information order. Produces __dpia_document__, from which __dpia_document_ref__ is extracted.
 
     CACAO step_id: action--d91a35c0-0000-4000-8000-00000000000a
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--d91a35c0-0000-4000-8000-00000000000a',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-00000000000a', 'secops_ng.step.name': 'produce_dpia_document', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'produce_dpia_document'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-00000000000a', 'secops_ng.step.name': 'produce_dpia_document', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'produce_dpia_document'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--d91a35c0-0000-4000-8000-00000000000a', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-00000000000a', 'secops_ng.step.name': 'produce_dpia_document', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'produce_dpia_document'})
+            AuditRecord(span_name='activity.action--d91a35c0-0000-4000-8000-00000000000a', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-00000000000a', 'secops_ng.step.name': 'produce_dpia_document', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'produce_dpia_document'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--d91a35c0-0000-4000-8000-00000000000a'"
-        )
+        from content.playbooks.data_protection_impact_assessment.primitives.document import compose_dpia_document
+        __dpia_document__ = compose_dpia_document(classification=__classification__, consultation=__dpo_consultation__, description=__processing_description__, determination=__article_36_determination__, execution_id=__execution_id__, mitigations=__mitigations__, necessity=__necessity_assessment__, produced_at=__document_produced_at__, risk_assessment=__risk_assessment__, screening=__screening__, workflow_id=__workflow_id__)
 
 PRODUCE_DPIA_DOCUMENT_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def schedule_review_cadence(dpia_case_id: str, dpia_document_ref: str) -> str:
-    """SKELETON — schedule the DPIA review cadence per Article 35(11). At minimum, the review is triggered on any material change to the risk represented by the processing envelope (change in categories of data, subjects, recipients, retention, purpose, or underlying-technology substrate). Records __review_cadence__ as the maximum interval between reviews absent such a change, and pins the review trigger to the operator's change-management surface. TODO (CORE): pin the change-management adapter and the review-trigger evidence-emission binding.
+async def schedule_review_cadence(dpia_document: dict[str, object], review_max_interval: str, review_change_triggers: str, change_management_ref: str, review_scheduled_at: str) -> dict[str, object]:
+    """Schedule the Article 35(11) review. A change of risk always triggers one; the operator may add specific changes, pinned to its change-management surface. The next review falls due no later than the maximum interval. A draft document is scheduled too, and the schedule says so. Produces __review_schedule__, from which __review_cadence__ is extracted.
 
     CACAO step_id: action--d91a35c0-0000-4000-8000-00000000000b
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--d91a35c0-0000-4000-8000-00000000000b',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-00000000000b', 'secops_ng.step.name': 'schedule_review_cadence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'schedule_review_cadence'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-00000000000b', 'secops_ng.step.name': 'schedule_review_cadence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'schedule_review_cadence'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--d91a35c0-0000-4000-8000-00000000000b', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-00000000000b', 'secops_ng.step.name': 'schedule_review_cadence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'schedule_review_cadence'})
+            AuditRecord(span_name='activity.action--d91a35c0-0000-4000-8000-00000000000b', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--d91a35c0-0000-4000-8000-00000000000b', 'secops_ng.step.name': 'schedule_review_cadence', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'schedule_review_cadence'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--d91a35c0-0000-4000-8000-00000000000b'"
-        )
+        from content.playbooks.data_protection_impact_assessment.primitives.review import schedule_review
+        __review_schedule__ = schedule_review(change_management_ref=__change_management_ref__, change_triggers=__review_change_triggers__, document=__dpia_document__, max_interval=__review_max_interval__, scheduled_at=__review_scheduled_at__)
 
 SCHEDULE_REVIEW_CADENCE_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @workflow.defn
 class PlaybookDataProtectionImpactAssessmentV1Workflow:
-    """SKELETON — CACAO v2 scaffold for the operator-side data protection impact assessment (DPIA) lifecycle a controller runs before deploying processing that is likely to result in a high risk to the rights and freedoms of natural persons under GDPR Article 35. Distinct from the after-the-fact breach-notification lane (Articles 33-34) and from the subject-initiated rights lifecycle (Articles 15-22): this is the proactive ex-ante assessment lane that runs before the processing is bound to production. The lifecycle chains ten steps: screen_dpia_triggers against the Article 35(3) mandatory-DPIA triggers (novel technology, large-scale processing, systematic-monitoring) and the operator's supervisory-authority Article 35(4) blacklist → classify_processing_type against the processing-inventory surface → gather_processing_description (Article 35(7)(a): purposes, categories of data and subjects, recipients, retention) → assess_necessity_and_proportionality (Article 35(7)(b)) → identify_and_assess_risks to rights and freedoms (Article 35(7)(c)) → identify_and_document_mitigations (Article 35(7)(d): safeguards, security measures, mechanisms) → dpo_consultation to obtain the Data Protection Officer's advice under Article 35(2) → determine_article_36_gate on the residual-risk threshold that triggers prior consultation with the supervisory authority under Article 36(1) → produce_dpia_document as the durable artifact recording the assessment for the operator's Article 5(2) accountability posture → schedule_review_cadence with a re-assessment hook at each material processing change under Article 35(11). Evidence outputs: dpia-screening-result, dpia-document, dpo-consultation- record, article-36-pre-consultation-flag (boolean). SKELETON only: the processing-inventory adapter, the risk-taxonomy binding, and the DPIA-document template are declared as adapter-bound surfaces the operator wires; a sibling CORE card lands the templates, the OSCAL binding closure, and the supervisory-authority pre-consultation submission chain. CACAO v2 + SecOps-NG content-model extensions.
+    """CACAO v2 playbook for the operator-side data protection impact assessment (DPIA) lifecycle a controller runs before deploying processing that is likely to result in a high risk to the rights and freedoms of natural persons under GDPR Article 35. Distinct from the after-the-fact breach-notification lane (Articles 33-34) and from the subject-initiated rights lifecycle (Articles 15-22): this is the proactive ex-ante assessment lane that runs before the processing is bound to production. Every step is bound to a deterministic primitive: screen_dpia_triggers (Article 35(10), similar-assessment coverage, Article 35(3), the supervisory authority's Article 35(4) and 35(5) lists, the WP248 rev.01 two-criteria rule) → a gate that ends the lifecycle on a negative screening, retained on the accountability ledger → classify_processing_type from the Article 30 record → gather_processing_description (Article 35(7)(a)) → assess_necessity_and_proportionality (Article 35(7)(b)) → identify_and_assess_risks (Article 35(7)(c)) on the operator's calibration → identify_and_document_mitigations (Article 35(7)(d)) with the residual risk after them → dpo_consultation (Article 35(2), and the Article 35(9) views of data subjects) → determine_article_36_gate on the residual risk and Article 36(5) → produce_dpia_document, final only with nothing left open → schedule_review_cadence (Article 35(11)). Evidence outputs: dpia-screening-result, dpia-document, dpo-consultation-record, article-36-pre-consultation-flag (boolean). The Article 30 record, the supervisory-authority lists, the risk taxonomy and the evidence store stay adapter-bound operator surfaces. CACAO v2 + SecOps-NG content-model extensions.
 
     CACAO playbook id : playbook--d91a35c0-0000-4000-8000-000000000001
     stable_id         : playbook.data_protection_impact_assessment@v1
-    content_version   : 0.1.0
-    maturity          : experimental
+    content_version   : 1.0.0
+    maturity          : stable
     workflow_start    : start--d91a35c0-0000-4000-8000-000000000001
     activities        : screen_dpia_triggers, classify_processing_type, gather_processing_description, assess_necessity_and_proportionality, identify_and_assess_risks, identify_and_document_mitigations, dpo_consultation, determine_article_36_gate, produce_dpia_document, schedule_review_cadence
     """
-
-    # Human-in-the-loop scaffold for CACAO step action--d91a35c0-0000-4000-8000-000000000002.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_screen_dpia_triggers_decision is not None` before continuing.
-    _screen_dpia_triggers_decision: bool | None = None
-    _screen_dpia_triggers_reason: str | None = None
-
-    @workflow.signal
-    def screen_dpia_triggers_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._screen_dpia_triggers_decision = decision
-        self._screen_dpia_triggers_reason = reason
-
-    @workflow.query
-    def screen_dpia_triggers_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._screen_dpia_triggers_decision is None:
-            return "pending"
-        return "approved" if self._screen_dpia_triggers_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--d91a35c0-0000-4000-8000-000000000003.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_classify_processing_type_decision is not None` before continuing.
-    _classify_processing_type_decision: bool | None = None
-    _classify_processing_type_reason: str | None = None
-
-    @workflow.signal
-    def classify_processing_type_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._classify_processing_type_decision = decision
-        self._classify_processing_type_reason = reason
-
-    @workflow.query
-    def classify_processing_type_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._classify_processing_type_decision is None:
-            return "pending"
-        return "approved" if self._classify_processing_type_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--d91a35c0-0000-4000-8000-000000000004.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_gather_processing_description_decision is not None` before continuing.
-    _gather_processing_description_decision: bool | None = None
-    _gather_processing_description_reason: str | None = None
-
-    @workflow.signal
-    def gather_processing_description_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._gather_processing_description_decision = decision
-        self._gather_processing_description_reason = reason
-
-    @workflow.query
-    def gather_processing_description_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._gather_processing_description_decision is None:
-            return "pending"
-        return "approved" if self._gather_processing_description_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--d91a35c0-0000-4000-8000-000000000005.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_assess_necessity_and_proportionality_decision is not None` before continuing.
-    _assess_necessity_and_proportionality_decision: bool | None = None
-    _assess_necessity_and_proportionality_reason: str | None = None
-
-    @workflow.signal
-    def assess_necessity_and_proportionality_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._assess_necessity_and_proportionality_decision = decision
-        self._assess_necessity_and_proportionality_reason = reason
-
-    @workflow.query
-    def assess_necessity_and_proportionality_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._assess_necessity_and_proportionality_decision is None:
-            return "pending"
-        return "approved" if self._assess_necessity_and_proportionality_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--d91a35c0-0000-4000-8000-000000000006.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_identify_and_assess_risks_decision is not None` before continuing.
-    _identify_and_assess_risks_decision: bool | None = None
-    _identify_and_assess_risks_reason: str | None = None
-
-    @workflow.signal
-    def identify_and_assess_risks_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._identify_and_assess_risks_decision = decision
-        self._identify_and_assess_risks_reason = reason
-
-    @workflow.query
-    def identify_and_assess_risks_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._identify_and_assess_risks_decision is None:
-            return "pending"
-        return "approved" if self._identify_and_assess_risks_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--d91a35c0-0000-4000-8000-000000000007.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_identify_and_document_mitigations_decision is not None` before continuing.
-    _identify_and_document_mitigations_decision: bool | None = None
-    _identify_and_document_mitigations_reason: str | None = None
-
-    @workflow.signal
-    def identify_and_document_mitigations_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._identify_and_document_mitigations_decision = decision
-        self._identify_and_document_mitigations_reason = reason
-
-    @workflow.query
-    def identify_and_document_mitigations_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._identify_and_document_mitigations_decision is None:
-            return "pending"
-        return "approved" if self._identify_and_document_mitigations_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--d91a35c0-0000-4000-8000-000000000008.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_dpo_consultation_decision is not None` before continuing.
-    _dpo_consultation_decision: bool | None = None
-    _dpo_consultation_reason: str | None = None
-
-    @workflow.signal
-    def dpo_consultation_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._dpo_consultation_decision = decision
-        self._dpo_consultation_reason = reason
-
-    @workflow.query
-    def dpo_consultation_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._dpo_consultation_decision is None:
-            return "pending"
-        return "approved" if self._dpo_consultation_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--d91a35c0-0000-4000-8000-000000000009.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_determine_article_36_gate_decision is not None` before continuing.
-    _determine_article_36_gate_decision: bool | None = None
-    _determine_article_36_gate_reason: str | None = None
-
-    @workflow.signal
-    def determine_article_36_gate_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._determine_article_36_gate_decision = decision
-        self._determine_article_36_gate_reason = reason
-
-    @workflow.query
-    def determine_article_36_gate_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._determine_article_36_gate_decision is None:
-            return "pending"
-        return "approved" if self._determine_article_36_gate_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--d91a35c0-0000-4000-8000-00000000000a.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_produce_dpia_document_decision is not None` before continuing.
-    _produce_dpia_document_decision: bool | None = None
-    _produce_dpia_document_reason: str | None = None
-
-    @workflow.signal
-    def produce_dpia_document_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._produce_dpia_document_decision = decision
-        self._produce_dpia_document_reason = reason
-
-    @workflow.query
-    def produce_dpia_document_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._produce_dpia_document_decision is None:
-            return "pending"
-        return "approved" if self._produce_dpia_document_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--d91a35c0-0000-4000-8000-00000000000b.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_schedule_review_cadence_decision is not None` before continuing.
-    _schedule_review_cadence_decision: bool | None = None
-    _schedule_review_cadence_reason: str | None = None
-
-    @workflow.signal
-    def schedule_review_cadence_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._schedule_review_cadence_decision = decision
-        self._schedule_review_cadence_reason = reason
-
-    @workflow.query
-    def schedule_review_cadence_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._schedule_review_cadence_decision is None:
-            return "pending"
-        return "approved" if self._schedule_review_cadence_decision else "denied"
 
     @workflow.run
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.data_protection_impact_assessment@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.data_protection_impact_assessment@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.1.0'})
+                AuditRecord(span_name='workflow.playbook.data_protection_impact_assessment@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--d91a35c0-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.data_protection_impact_assessment@v1'"
