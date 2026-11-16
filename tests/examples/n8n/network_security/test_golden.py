@@ -140,6 +140,11 @@ def test_set_nodes_surface_non_empty_x_secops_ng_refs() -> None:
     appears as a Set-node assignment on the emitted n8n node. Empty
     ref categories are dropped by the emitter (compilers/n8n/emit.py)
     and are not asserted here.
+
+    Since the CORE-WIRE change all five action steps are bound and emit
+    Code nodes, so this check is vacuous here. It is kept rather than
+    deleted: it starts asserting the moment a step is unbound again. The
+    live check for the bound steps is ``test_core_body_steps_emit_code_nodes``.
     """
     steps = _cacao_workflow_steps()
     workflow = json.loads(WORKED_EXAMPLE.read_text(encoding="utf-8"))
@@ -168,3 +173,38 @@ def test_set_nodes_surface_non_empty_x_secops_ng_refs() -> None:
                 f"step {step_id!r}: x_secops_ng.{key} dropped from Set node; "
                 f"present assignments: {sorted(names)}"
             )
+
+
+def test_core_body_steps_emit_code_nodes() -> None:
+    """Every bound step compiles to an n8n Code node that imports its
+    primitive and binds the declared ``out`` variable to the call.
+
+    Catches an emitter regression (a Set node, or a Code node that imports
+    the primitive without calling it), which byte-parity alone misses once a
+    careless regenerate bakes it into the golden. The count is asserted so a
+    broken selector cannot pass vacuously.
+    """
+    steps = _cacao_workflow_steps()
+    workflow = json.loads(WORKED_EXAMPLE.read_text(encoding="utf-8"))
+    nodes_by_id = {node["id"]: node for node in workflow["nodes"]}
+    bound = {sid: s for sid, s in steps.items() if (secops_extension(s) or {}).get("core_body")}
+    assert len(bound) == 5, f"expected all five action steps bound, found {len(bound)}"
+    for step_id, step in bound.items():
+        node = nodes_by_id[step_id]
+        assert node["type"] == "n8n-nodes-base.code", f"{step_id}: {node['type']}"
+        body = node["parameters"].get("pythonCode", "")
+        core = secops_extension(step)["core_body"]
+        module, _, fn = core["primitive"].rpartition(".")
+        assert f"from {module} import {fn}" in body, f"{step_id}: primitive not imported"
+        assert f"{core['out']} = {fn}(" in body, f"{step_id}: call not bound"
+
+
+def test_remediation_runs_on_every_window() -> None:
+    """The topology stays linear: enforce_remediation is on the only path,
+    so an empty window still reaches the evidence step through it."""
+    steps = _cacao_workflow_steps()
+    assert not [s for s in steps.values() if s.get("type") == "if-condition"]
+    names = {s.get("name"): s for s in steps.values()}
+    evidence_id = names["generate_posture_evidence_artifact"]
+    assert names["enforce_remediation"]["on_completion"] in steps
+    assert steps[names["enforce_remediation"]["on_completion"]] is evidence_id

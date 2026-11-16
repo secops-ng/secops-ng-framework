@@ -20,138 +20,118 @@ _TRACER = trace.get_tracer(__name__)
 from ._audit_mirror import AuditRecord, AuditTrail
 
 @activity.defn
-async def inventory_network_segments(reconciliation_window: str) -> str:
-    """Enumerate the documented network segments on the operator's own deployed estate by reading the operator's declared network-inventory sources under the operator's documented source-precedence ordering: declarative infrastructure-as- code records for VLAN / VPC / subnet / zone definitions, the cloud-provider network APIs (VPC / subnet describe endpoints keyed off the operator's account inventory), and the on- premise network-controller inventories. Read-only against each source. Composes the operator-authoritative segment record list under a canonical, source-precedence-ordered hash and pins __segment_inventory_id__ against the composed snapshot; the deterministic derivation lets replays of the same reconciliation window recover the same inventory identifier without re-hitting the sources. Each segment record carries the zone identifier, the cloud/on-premise account or controller binding, the CIDR / IP-plan allocation, and the tenancy label the policy-evaluation step reads. OCSF Network Activity (class_uid 4001) shape: an inventory-composed event is emitted at snapshot pinning naming __reconciliation_window__ and __segment_inventory_id__ for the audit-evident chain.
+async def inventory_network_segments(reconciliation_window: str, inventory_sources: str, inventory_composed_at: str) -> dict[str, object]:
+    """Compose the window's segment inventory from the operator's network-inventory sources in its documented precedence order: infrastructure-as-code records, cloud-provider network APIs and on-premise network controllers, read-only. Where two sources report the same segment the higher one's record is kept and every field a lower one disagrees on is recorded. A segment no declarative source reports is in the estate but not in the documentation, and is listed as undocumented; overlapping ranges inside one binding are listed too. Produces __segment_inventory__, from which __segment_inventory_id__ is extracted.
 
     CACAO step_id: action--7e750001-0000-4000-8000-000000000002
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--7e750001-0000-4000-8000-000000000002',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--7e750001-0000-4000-8000-000000000002', 'secops_ng.step.name': 'inventory_network_segments', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'inventory_network_segments'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--7e750001-0000-4000-8000-000000000002', 'secops_ng.step.name': 'inventory_network_segments', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'inventory_network_segments'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--7e750001-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--7e750001-0000-4000-8000-000000000002', 'secops_ng.step.name': 'inventory_network_segments', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'inventory_network_segments'})
+            AuditRecord(span_name='activity.action--7e750001-0000-4000-8000-000000000002', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--7e750001-0000-4000-8000-000000000002', 'secops_ng.step.name': 'inventory_network_segments', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'inventory_network_segments'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--7e750001-0000-4000-8000-000000000002'"
-        )
+        from content.playbooks.network_security.primitives.inventory import compose_segment_inventory
+        __segment_inventory__ = compose_segment_inventory(window_ref=__reconciliation_window__, sources=__inventory_sources__, composed_at=__inventory_composed_at__)
 
 INVENTORY_NETWORK_SEGMENTS_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def evaluate_segmentation_policy(reconciliation_window: str, segment_inventory_id: str) -> str:
-    """Read the current segmentation-policy snapshot from the operator's documented policy source (declared zone-transit matrix, per-segment allowance set, OSCAL-anchored control binding for SC-7 boundary-protection and SC-3 security- function isolation) and normalise it against the segment inventory pinned upstream. Pins __policy_snapshot_id__ against the resolved revision so the evidence artifact identifies which policy the reconciliation ran against. Records the per-segment-pair allowance state under the documented three-value allowance algebra (allowed / denied / conditional) — the conditional branch names the predicate the detect step must evaluate against observed reachability before deciding whether a per-pair violation stands. Empty allowance set is emitted explicitly so a policy-missing reconciliation window still closes with an audit-evident artifact rather than short-circuiting the chain silently.
+async def evaluate_segmentation_policy(segment_inventory: dict[str, object], segmentation_policy: dict[str, object], policy_evaluated_at: str) -> dict[str, object]:
+    """Normalise the operator's zone-transit matrix against the inventory and pin the snapshot the window is reconciled against. Every directed zone pair is allowed, denied, or conditional on services or a time-boxed authorisation; every pair the matrix does not list is denied, within a zone as well as between zones (Commission Implementing Regulation (EU) 2024/2690, Annex points 6.7.2(c) and 6.8.2(e)). The policy's own gaps are recorded. Produces __policy_evaluation__, from which __policy_snapshot_id__ is extracted.
 
     CACAO step_id: action--7e750001-0000-4000-8000-000000000003
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--7e750001-0000-4000-8000-000000000003',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--7e750001-0000-4000-8000-000000000003', 'secops_ng.step.name': 'evaluate_segmentation_policy', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evaluate_segmentation_policy'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--7e750001-0000-4000-8000-000000000003', 'secops_ng.step.name': 'evaluate_segmentation_policy', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evaluate_segmentation_policy'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--7e750001-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--7e750001-0000-4000-8000-000000000003', 'secops_ng.step.name': 'evaluate_segmentation_policy', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evaluate_segmentation_policy'})
+            AuditRecord(span_name='activity.action--7e750001-0000-4000-8000-000000000003', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--7e750001-0000-4000-8000-000000000003', 'secops_ng.step.name': 'evaluate_segmentation_policy', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'evaluate_segmentation_policy'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--7e750001-0000-4000-8000-000000000003'"
-        )
+        from content.playbooks.network_security.primitives.policy import evaluate_segmentation_policy
+        __policy_evaluation__ = evaluate_segmentation_policy(inventory=__segment_inventory__, policy=__segmentation_policy__, evaluated_at=__policy_evaluated_at__)
 
 EVALUATE_SEGMENTATION_POLICY_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def detect_policy_violations(segment_inventory_id: str, policy_snapshot_id: str) -> str:
-    """Compute the per-segment-pair violation set by comparing the observed reachability posture against the policy-snapshot allowance state. Observed reachability is drawn from the operator's documented telemetry sources under the documented source-precedence: network-traffic observations (OCSF Network Activity 4001 events emitted by the operator's flow-log stream), boundary-control state pulled from the operator's firewall / security-group inventory, and active reachability probes where the operator's documented probe surface is bound. Each per-pair evaluation resolves to allowed-and-observed (no violation), denied- and-not-observed (no violation, evidence recorded), denied-and-observed (violation emitted), or conditional (predicate evaluated against the observed traffic fingerprint before deciding). Violations are classified against the documented taxonomy — undocumented-transit (traffic across a segment-pair not in the allowance set), unauthorised-egress (traffic to a boundary the policy denies), boundary-control-drift (the firewall / security- group state diverged from the declared zone-transit matrix) — and pinned to __violation_set_id__. The set is keyed against __segment_inventory_id__ + __policy_snapshot_id__ so the same inputs re-emit the same violation identifiers under replay. D3FEND anchor: D3-NTA (network traffic analysis) — the detect step is the operator-side network-traffic analysis primitive against the declared policy. Empty set is emitted explicitly so a clean-window reconciliation is distinguishable from a skipped step.
+async def detect_policy_violations(segment_inventory: dict[str, object], policy_evaluation: dict[str, object], observed_transits: str, boundary_rules: str, violations_detected_at: str) -> dict[str, object]:
+    """Compare the observed transits and the boundary rules in force against the pinned matrix. An observed transit outside it is unauthorised_egress when the destination is an external zone and undocumented_transit otherwise; a conditional allowance holds only for its services and inside its authorisation window. A boundary rule that permits what the matrix denies or does not list, or denies what it plainly allows, is boundary_control_drift, recorded with its direction whether or not traffic was seen. Repeated sightings merge into one violation. The set may be empty. Produces __violation_detection__, from which __violation_set_id__ is extracted.
 
     CACAO step_id: action--7e750001-0000-4000-8000-000000000004
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--7e750001-0000-4000-8000-000000000004',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--7e750001-0000-4000-8000-000000000004', 'secops_ng.step.name': 'detect_policy_violations', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'detect_policy_violations'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--7e750001-0000-4000-8000-000000000004', 'secops_ng.step.name': 'detect_policy_violations', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'detect_policy_violations'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--7e750001-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--7e750001-0000-4000-8000-000000000004', 'secops_ng.step.name': 'detect_policy_violations', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'detect_policy_violations'})
+            AuditRecord(span_name='activity.action--7e750001-0000-4000-8000-000000000004', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--7e750001-0000-4000-8000-000000000004', 'secops_ng.step.name': 'detect_policy_violations', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'detect_policy_violations'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--7e750001-0000-4000-8000-000000000004'"
-        )
+        from content.playbooks.network_security.primitives.detection import detect_policy_violations
+        __violation_detection__ = detect_policy_violations(inventory=__segment_inventory__, policy=__policy_evaluation__, observations=__observed_transits__, boundary_rules=__boundary_rules__, detected_at=__violations_detected_at__)
 
 DETECT_POLICY_VIOLATIONS_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def enforce_remediation(violation_set_id: str) -> str:
-    """Engage the operator's pre-bound remediation surface against each violation in __violation_set_id__ per the operator's documented per-classification remediation binding. Three documented surfaces: (a) per-segment ACL / firewall-rule change dispatched against the operator's change-management posture (undocumented-transit and unauthorised-egress classifications default here), (b) boundary-control posture-change ticket opened against the operator's documented ticketing surface (boundary-control-drift classification defaults here), (c) short-circuit isolation of the offending path where the violation's severity marker names an active-abuse fingerprint and the operator's documented isolation posture allows automated engagement. Empty when __violation_set_id__ resolved empty; the closure record still names the empty set so the audit-evident chain remains complete. Each engaged action returns a persistent identifier (change-ticket id, posture-change- ticket id, or isolation-record id) that the evidence artifact binds under __remediation_action_id__ together with a per-violation dispatch table naming which surface was engaged against which violation. The playbook does not author the remediation architecture — it dispatches against pre-bound surfaces the operator's change- management posture already documents; auditability is preserved by requiring every engaged action to return an operator-side persistent identifier before the step closes.
+async def enforce_remediation(violation_detection: dict[str, object], remediation_binding: dict[str, object], automated_isolation_allowed: bool, remediation_dispatches: str, remediation_dispatched_at: str) -> dict[str, object]:
+    """Record the dispatch of every violation to the operator's pre-bound remediation surface: a rule change or a posture ticket per the binding. Isolation is the short-circuit, never the default: only a violation carrying an active-abuse fingerprint, and only when the operator's posture allows automated isolation (Delegated Regulation (EU) 2024/1774, Art. 13). The step closes only when every dispatch has returned a persistent identifier. It runs on every window; with an empty violation set it dispatches nothing. Produces __remediation_dispatch__, from which __remediation_action_id__ is extracted, unset when nothing was dispatched.
 
     CACAO step_id: action--7e750001-0000-4000-8000-000000000005
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--7e750001-0000-4000-8000-000000000005',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--7e750001-0000-4000-8000-000000000005', 'secops_ng.step.name': 'enforce_remediation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enforce_remediation'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--7e750001-0000-4000-8000-000000000005', 'secops_ng.step.name': 'enforce_remediation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enforce_remediation'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--7e750001-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--7e750001-0000-4000-8000-000000000005', 'secops_ng.step.name': 'enforce_remediation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enforce_remediation'})
+            AuditRecord(span_name='activity.action--7e750001-0000-4000-8000-000000000005', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--7e750001-0000-4000-8000-000000000005', 'secops_ng.step.name': 'enforce_remediation', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'enforce_remediation'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--7e750001-0000-4000-8000-000000000005'"
-        )
+        from content.playbooks.network_security.primitives.remediation import dispatch_remediation
+        __remediation_dispatch__ = dispatch_remediation(detection=__violation_detection__, binding=__remediation_binding__, automated_isolation=__automated_isolation_allowed__, dispatches=__remediation_dispatches__, dispatched_at=__remediation_dispatched_at__)
 
 ENFORCE_REMEDIATION_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @activity.defn
-async def generate_posture_evidence_artifact(reconciliation_window: str, segment_inventory_id: str, policy_snapshot_id: str, violation_set_id: str, remediation_action_id: str) -> str:
-    """Publish the dated network-security-posture evidence artifact to the operator's evidence store. The artifact is shaped against an OSCAL Assessment Result stub: the assessed subject is the reconciled segment inventory pinned by __segment_inventory_id__, the assessment activity is the policy-reconciliation run keyed by __reconciliation_window__ against __policy_snapshot_id__, the finding set carries one finding per violation in __violation_set_id__ (or an explicit no-findings marker when the set is empty), and the response record binds each finding to the engaged remediation action from __remediation_action_id__. The artifact closes the audit-evident chain end-to-end for the window: an auditor reading the record can trace from window identifier through inventory, policy, violation set, and remediation dispatch to the operator-side persistent identifier the remediation surface returned. Pins __posture_evidence_id__ against the persisted record. Always emitted, including on the empty-violation-set branch — the closure record is the primary audit-evident output of the reconciliation regardless of whether any violation was surfaced.
+async def generate_posture_evidence_artifact(segment_inventory: dict[str, object], policy_evaluation: dict[str, object], violation_detection: dict[str, object], remediation_dispatch: dict[str, object], evidence_produced_at: str) -> dict[str, object]:
+    """Compose the dated posture evidence for the window, shaped after an OSCAL assessment result. The chain is checked: the policy evaluation must be of this inventory, the detection of this inventory and snapshot, and the dispatch of this violation set; a record from another window is refused. Every finding names its surface and the identifier the surface returned; an empty window says no_findings. Undocumented segments, source disagreements and the policy's own gaps are carried as open items. Produces __posture_evidence__, from which __posture_evidence_id__ is extracted.
 
     CACAO step_id: action--7e750001-0000-4000-8000-000000000006
     """
-    # CACAO `manual` command — this activity is the side-effect half of
-    # a human-in-the-loop step. The workflow class above carries the
-    # matching @workflow.signal and @workflow.query handlers.
     with _TRACER.start_as_current_span(
         name='activity.action--7e750001-0000-4000-8000-000000000006',
-        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--7e750001-0000-4000-8000-000000000006', 'secops_ng.step.name': 'generate_posture_evidence_artifact', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'generate_posture_evidence_artifact'},
+        attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--7e750001-0000-4000-8000-000000000006', 'secops_ng.step.name': 'generate_posture_evidence_artifact', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'generate_posture_evidence_artifact'},
     ):
         AuditTrail.current().append(
-            AuditRecord(span_name='activity.action--7e750001-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0', 'secops_ng.step.id': 'action--7e750001-0000-4000-8000-000000000006', 'secops_ng.step.name': 'generate_posture_evidence_artifact', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'generate_posture_evidence_artifact'})
+            AuditRecord(span_name='activity.action--7e750001-0000-4000-8000-000000000006', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0', 'secops_ng.step.id': 'action--7e750001-0000-4000-8000-000000000006', 'secops_ng.step.name': 'generate_posture_evidence_artifact', 'secops_ng.step.type': 'action', 'secops_ng.tool.name': 'generate_posture_evidence_artifact'})
         )
-        raise NotImplementedError(
-            f"CACAO action stub not implemented: step_id='action--7e750001-0000-4000-8000-000000000006'"
-        )
+        from content.playbooks.network_security.primitives.evidence import compose_posture_evidence
+        __posture_evidence__ = compose_posture_evidence(inventory=__segment_inventory__, policy=__policy_evaluation__, detection=__violation_detection__, remediation=__remediation_dispatch__, produced_at=__evidence_produced_at__)
 
 GENERATE_POSTURE_EVIDENCE_ARTIFACT_RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
-    maximum_interval=timedelta(seconds=1),
-    backoff_coefficient=1.0,
-    maximum_attempts=1,
+    maximum_interval=timedelta(seconds=60),
+    backoff_coefficient=2.0,
+    maximum_attempts=3,
 )
 
 @workflow.defn
@@ -160,115 +140,20 @@ class PlaybookNetworkSecurityV1Workflow:
 
     CACAO playbook id : playbook--7e750001-0000-4000-8000-000000000001
     stable_id         : playbook.network_security@v1
-    content_version   : 0.2.0
-    maturity          : experimental
+    content_version   : 1.0.0
+    maturity          : stable
     workflow_start    : start--7e750001-0000-4000-8000-000000000001
     activities        : inventory_network_segments, evaluate_segmentation_policy, detect_policy_violations, enforce_remediation, generate_posture_evidence_artifact
     """
-
-    # Human-in-the-loop scaffold for CACAO step action--7e750001-0000-4000-8000-000000000002.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_inventory_network_segments_decision is not None` before continuing.
-    _inventory_network_segments_decision: bool | None = None
-    _inventory_network_segments_reason: str | None = None
-
-    @workflow.signal
-    def inventory_network_segments_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._inventory_network_segments_decision = decision
-        self._inventory_network_segments_reason = reason
-
-    @workflow.query
-    def inventory_network_segments_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._inventory_network_segments_decision is None:
-            return "pending"
-        return "approved" if self._inventory_network_segments_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--7e750001-0000-4000-8000-000000000003.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_evaluate_segmentation_policy_decision is not None` before continuing.
-    _evaluate_segmentation_policy_decision: bool | None = None
-    _evaluate_segmentation_policy_reason: str | None = None
-
-    @workflow.signal
-    def evaluate_segmentation_policy_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._evaluate_segmentation_policy_decision = decision
-        self._evaluate_segmentation_policy_reason = reason
-
-    @workflow.query
-    def evaluate_segmentation_policy_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._evaluate_segmentation_policy_decision is None:
-            return "pending"
-        return "approved" if self._evaluate_segmentation_policy_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--7e750001-0000-4000-8000-000000000004.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_detect_policy_violations_decision is not None` before continuing.
-    _detect_policy_violations_decision: bool | None = None
-    _detect_policy_violations_reason: str | None = None
-
-    @workflow.signal
-    def detect_policy_violations_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._detect_policy_violations_decision = decision
-        self._detect_policy_violations_reason = reason
-
-    @workflow.query
-    def detect_policy_violations_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._detect_policy_violations_decision is None:
-            return "pending"
-        return "approved" if self._detect_policy_violations_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--7e750001-0000-4000-8000-000000000005.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_enforce_remediation_decision is not None` before continuing.
-    _enforce_remediation_decision: bool | None = None
-    _enforce_remediation_reason: str | None = None
-
-    @workflow.signal
-    def enforce_remediation_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._enforce_remediation_decision = decision
-        self._enforce_remediation_reason = reason
-
-    @workflow.query
-    def enforce_remediation_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._enforce_remediation_decision is None:
-            return "pending"
-        return "approved" if self._enforce_remediation_decision else "denied"
-
-    # Human-in-the-loop scaffold for CACAO step action--7e750001-0000-4000-8000-000000000006.
-    # State + signal + query — the integrator wires `run()` to
-    # await `_generate_posture_evidence_artifact_decision is not None` before continuing.
-    _generate_posture_evidence_artifact_decision: bool | None = None
-    _generate_posture_evidence_artifact_reason: str | None = None
-
-    @workflow.signal
-    def generate_posture_evidence_artifact_approve(self, decision: bool, reason: str | None = None) -> None:
-        """Signal handler — operator releases the workflow with decision/reason."""
-        self._generate_posture_evidence_artifact_decision = decision
-        self._generate_posture_evidence_artifact_reason = reason
-
-    @workflow.query
-    def generate_posture_evidence_artifact_status(self) -> str:
-        """Query handler — `pending` until a signal arrives, then `approved`/`denied`."""
-        if self._generate_posture_evidence_artifact_decision is None:
-            return "pending"
-        return "approved" if self._generate_posture_evidence_artifact_decision else "denied"
 
     @workflow.run
     async def run(self) -> None:
         with _TRACER.start_as_current_span(
             name='workflow.playbook.network_security@v1',
-            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0'},
+            attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'},
         ):
             AuditTrail.current().append(
-                AuditRecord(span_name='workflow.playbook.network_security@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '0.2.0'})
+                AuditRecord(span_name='workflow.playbook.network_security@v1', attributes={'secops_ng.compile.target': 'temporal', 'secops_ng.playbook.id': 'playbook--7e750001-0000-4000-8000-000000000001', 'secops_ng.playbook.version': '1.0.0'})
             )
             raise NotImplementedError(
                 f"CACAO workflow lowering not implemented: stable_id='playbook.network_security@v1'"

@@ -26,13 +26,13 @@ for the EU sovereign-security community.
 This walkthrough wires the shipped playbook through all three
 reference compile targets (n8n, Temporal, LangGraph) and shows where
 each reconciliation stage — inventory, evaluate, detect, remediate,
-generate-evidence — lands in each. Adapter bodies (network-inventory
-source set, segmentation-policy source, reachability-observation
-source, remediation surface, evidence store) are declared as
-adapter-bound surfaces the operator wires; the shipped CORE artifact
-lands the byte-parity emitter fan-out under
-`examples/{n8n,temporal,langgraph}/network_security/` and the
-cross-target parity test.
+generate-evidence — lands in each. Every action step calls a
+deterministic primitive under
+`content/playbooks/network_security/primitives/`, and the playbook is
+`stable`. The operator surfaces (network-inventory sources,
+segmentation policy, flow logs and probes, boundary-control state,
+remediation channels, evidence store) stay operator-owned: they feed
+the adapter inputs the primitives read (§ 4, § 5).
 
 > The framework is framework-agnostic by construction. n8n /
 > Temporal / LangGraph are *three of three* reference targets;
@@ -195,19 +195,31 @@ still fires unconditionally.
 The playbook ships seven steps: one `start`, five `action`, and one
 `end`. The topology is a linear
 inventory → evaluate → detect → remediate → generate-evidence chain.
-Each action step carries a CACAO I/O contract (`in_args` /
-`out_args`) and an `x_secops_ng.control_refs` binding. The
-step-to-control map is:
+Each action step binds its primitive through `core_body` and carries
+the matching `secops-ng-primitive` command, plus an
+`x_secops_ng.control_refs` binding. Each step reads adapter inputs and
+the envelopes before it, and emits one envelope from which the
+identifier the SKELETON declared is extracted:
 
-| Step suffix | Step | I/O contract | `x_secops_ng.control_refs` | OSCAL anchor | Regulatory anchor |
-|---|---|---|---|---|---|
-| `…000001` | `netsec_posture_start` | — | — | — | — |
-| `…000002` | inventory network segments | `__reconciliation_window__` → `__segment_inventory_id__` | `control.network_boundary_protection@v1` | NIST SP 800-53 Rev. 5 **CA-9** — Internal System Connections | NIS2 Art. 21(2)(e); DORA Art. 9 |
-| `…000003` | evaluate segmentation policy | `__reconciliation_window__` + `__segment_inventory_id__` → `__policy_snapshot_id__` | `control.network_boundary_protection@v1` | NIST SP 800-53 Rev. 5 **SC-7** — Boundary Protection; **SC-3** — Security Function Isolation | NIS2 Art. 21(2)(e); DORA Art. 9 |
-| `…000004` | detect policy violations | `__segment_inventory_id__` + `__policy_snapshot_id__` → `__violation_set_id__` | `control.network_boundary_protection@v1` | NIST SP 800-53 Rev. 5 **SC-7** — Boundary Protection | NIS2 Art. 21(2)(e); DORA Art. 9 |
-| `…000005` | enforce remediation | `__violation_set_id__` → `__remediation_action_id__` | `control.network_boundary_protection@v1` | NIST SP 800-53 Rev. 5 **SC-7** — Boundary Protection | NIS2 Art. 21(2)(e); DORA Art. 9 |
-| `…000006` | generate posture evidence artifact | `__reconciliation_window__` + `__segment_inventory_id__` + `__policy_snapshot_id__` + `__violation_set_id__` + `__remediation_action_id__` → `__posture_evidence_id__` | `control.network_boundary_protection@v1` | NIST SP 800-53 Rev. 5 **CA-9** / OSCAL Assessment Result stub | NIS2 Art. 21(2)(e); DORA Art. 9 |
-| `…000007` | `netsec_posture_end` | — | — | — | — |
+| Step suffix | Step | Primitive (`primitives/…`) | Adapter inputs | Envelope → extracted | OSCAL anchor | Regulatory anchor |
+|---|---|---|---|---|---|---|
+| `…000001` | `netsec_posture_start` | — | — | — | — | — |
+| `…000002` | inventory network segments | `inventory.compose_segment_inventory` | `__reconciliation_window__`, `__inventory_sources__`, `__inventory_composed_at__` | `__segment_inventory__` → `__segment_inventory_id__` | NIST SP 800-53 Rev. 5 **CA-9** — Internal System Connections | NIS2 Art. 21(2)(e); DORA Art. 9 |
+| `…000003` | evaluate segmentation policy | `policy.evaluate_segmentation_policy` | `__segmentation_policy__`, `__policy_evaluated_at__` | `__policy_evaluation__` → `__policy_snapshot_id__` | NIST SP 800-53 Rev. 5 **SC-7** — Boundary Protection; **SC-3** — Security Function Isolation | NIS2 Art. 21(2)(e); DORA Art. 9 |
+| `…000004` | detect policy violations | `detection.detect_policy_violations` | `__observed_transits__`, `__boundary_rules__`, `__violations_detected_at__` | `__violation_detection__` → `__violation_set_id__` | NIST SP 800-53 Rev. 5 **SC-7** — Boundary Protection | NIS2 Art. 21(2)(e); DORA Art. 9 |
+| `…000005` | enforce remediation | `remediation.dispatch_remediation` | `__remediation_binding__`, `__automated_isolation_allowed__`, `__remediation_dispatches__`, `__remediation_dispatched_at__` | `__remediation_dispatch__` → `__remediation_action_id__` (unset on an empty window) | NIST SP 800-53 Rev. 5 **SC-7** — Boundary Protection | NIS2 Art. 21(2)(e); DORA Art. 9 |
+| `…000006` | generate posture evidence artifact | `evidence.compose_posture_evidence` | `__evidence_produced_at__` | `__posture_evidence__` → `__posture_evidence_id__` | NIST SP 800-53 Rev. 5 **CA-9** / OSCAL Assessment Result shape | NIS2 Art. 21(2)(e); DORA Art. 9 |
+| `…000007` | `netsec_posture_end` | — | — | — | — | — |
+
+The contract has 23 variables: 13 adapter inputs, five envelopes and
+the five extracted identifiers. The inventory sources, the observed
+transits, the boundary rules and the dispatches ride as JSON strings,
+because CACAO has no list type. `__remediation_binding__` defaults to
+the playbook's `DEFAULT_BINDING` (rule changes for undocumented transit
+and unauthorised egress, a posture ticket for boundary-control drift),
+carried as JSON text in the variable's `value`; the adapter decodes it
+like the lists. `__automated_isolation_allowed__` has no default: the
+operator states its isolation posture every run.
 
 The `control.network_boundary_protection@v1` placeholder control
 lives at `content/controls/control.network_boundary_protection@v1.yaml`
@@ -236,8 +248,8 @@ Each event names the reconciliation window and the pinned artifact
 identifier so the audit-evident chain is emitter-side reconstructable
 from telemetry alone if the evidence store is subsequently unavailable.
 
-The playbook maturity is `experimental` on the workflow-local content
-marker. The mappings overlay pins the outbound surface (OSCAL SC-7 /
+The playbook is `stable`, `content_version` 1.0.0, since the CORE-WIRE
+change. The mappings overlay pins the outbound surface (OSCAL SC-7 /
 SC-3 / CA-9, D3FEND D3-NTA + D3-ISVA on detect, OCSF Network Activity
 4001) and the inbound regulatory closure (NIS2 Art. 21(2)(e), DORA
 Art. 9; CRA and GDPR are recorded as orphan-skip entries per the
@@ -265,9 +277,9 @@ operator's declaration.
 
 ## 6. Three-target hand-off
 
-The shipped worked examples under
+The worked examples under
 `examples/{n8n,temporal,langgraph}/network_security/` compile the same
-CACAO source into three reference orchestrator idioms. The
+bound CACAO source into three reference orchestrator idioms. The
 `tests/examples/{n8n,temporal,langgraph}/network_security/test_golden.py`
 byte-parity goldens guard the ring across all three targets on every
 PR — a compiler change that would drift any target from the committed
@@ -275,64 +287,43 @@ example fails CI.
 
 ### 6.1 n8n
 
-The n8n emitter under `compilers/n8n/emit.py` lands the CACAO chain
-as a linear n8n workflow: one Set-node per action step carrying the
-`x_secops_ng.<key>` bundle as node assignments, connected in the
-inventory → evaluate → detect → remediate → generate-evidence order
-the CACAO `on_completion` links declare. Each n8n node id is the
-CACAO step id verbatim — the node-id parity test in the golden pins
-the invariant.
+The n8n emitter lands the chain as a linear workflow: one
+`manualTrigger`, five `code` nodes and a `noOp` terminal, connected in
+the inventory → evaluate → detect → remediate → generate-evidence order
+the CACAO `on_completion` links declare. Each n8n node id is the CACAO
+step id verbatim, and each Code node imports its primitive and binds
+the step's envelope to the call:
 
-The Set-node surface is the operator-facing wiring point in n8n:
-each `x_secops_ng.<key>` assignment names one of the operator-bound
-surfaces (`x_secops_ng.control_refs`, `x_secops_ng.telemetry_refs`)
-and stays visible in the n8n canvas as a first-class node parameter
-rather than getting collapsed into an opaque script body. Operators
-wire the adapter surfaces upstream and downstream of the Set-node
-ring — a Function-node or HTTP-node reads the operator's
-network-inventory source and lands `__segment_inventory_id__` on
-the inventory step; a Function-node or HTTP-node reads the
-segmentation-policy source and lands `__policy_snapshot_id__` on
-the evaluate step; and so on across the ring.
+```python
+from content.playbooks.network_security.primitives.remediation import dispatch_remediation
+__remediation_dispatch__ = dispatch_remediation(detection=__violation_detection__, binding=__remediation_binding__, ...)
+```
+
+The compile records no lossy translations. Operators wire the adapter
+around the ring: the readers that yield the inventory sources, the
+policy, the flow-log and probe observations and the boundary rules, the
+remediation channels that return the dispatch receipts, and the
+evidence store that keeps `__posture_evidence__`.
 
 ### 6.2 Temporal
 
-The Temporal emitter under `compilers/temporal/emit.py` lands the
-CACAO chain as a workflow-and-activity fan-out: a
-`NetworkSecurityWorkflow` orchestrator plus one activity per action
-step (`inventory_network_segments`, `evaluate_segmentation_policy`,
+The Temporal emitter lands one activity per action step
+(`inventory_network_segments`, `evaluate_segmentation_policy`,
 `detect_policy_violations`, `enforce_remediation`,
-`generate_posture_evidence_artifact`). The workflow signature declares
-`__reconciliation_window__` as the input and returns
-`__posture_evidence_id__` — the closure record identifier — as the
-output. Intermediate identifiers flow through workflow-scoped state
-so a worker restart mid-window replays against the same pinned
-identifiers rather than re-hitting the upstream sources.
-
-The Temporal target is the durable-code emission of the same CACAO
-source. The workflow-level history is the audit-evident replay
-surface: an auditor reading the Temporal history sees each activity
-input and output pinned to the same identifiers the evidence artifact
-carries. Retries live inside each activity (idempotent against the
-upstream source) rather than at the workflow layer — the reconciliation
-ring itself is a straight-line workflow.
+`generate_posture_evidence_artifact`), each calling its primitive, and
+a `PlaybookNetworkSecurityV1Workflow` class. The workflow's `run`
+method leaves control flow to the integrator, as it does for every
+playbook. The primitives are pure and take every instant as an input,
+so a history replay re-derives the same envelopes and identifiers.
 
 ### 6.3 LangGraph
 
-The LangGraph emitter under `compilers/langgraph/emit.py` lands the
-CACAO chain as a `StateGraph` with one node per action step, sharing
-a Pydantic v2 state model whose fields are the CACAO variables:
-`reconciliation_window`, `segment_inventory_id`, `policy_snapshot_id`,
-`violation_set_id`, `remediation_action_id`, `posture_evidence_id`.
-Node functions are pure state-transitions — each reads the fields it
-declares in `in_args`, writes the fields it declares in `out_args`,
-and returns the state delta the graph merges.
-
-The LangGraph target is the agentic-idiom emission of the same CACAO
-source. The state model is the audit-evident replay surface: the
-final `posture_evidence_id` value on the terminal state is the
-closure identifier, and the intermediate identifiers stay reconstructable
-from the state trajectory the graph runner logs.
+The LangGraph emitter lands a target-neutral GraphSpec (five nodes, a
+linear chain) and a `TypedDict` state whose fields are the CACAO
+variables, with one `@tool` per action step whose body calls the
+primitive. A checkpoint reload re-hydrates the same window, and the
+final `posture_evidence_id` on the terminal state is the closure
+identifier.
 
 ### 6.4 Cross-target invariants
 
@@ -343,14 +334,9 @@ byte-parity goldens:
   appears once as an n8n node id, once as a Temporal activity name
   (via the CACAO `name` field), and once as a LangGraph node key —
   the reconciliation graph shape is the same across targets.
-- **Variable parity.** The six playbook variables
-  (`__reconciliation_window__`, `__segment_inventory_id__`,
-  `__policy_snapshot_id__`, `__violation_set_id__`,
-  `__remediation_action_id__`, `__posture_evidence_id__`) surface in
-  each target under the target's idiomatic variable-passing surface —
-  n8n Set-node assignments, Temporal activity arguments and returns,
-  LangGraph state fields — and no additional target-local identifiers
-  are introduced.
+- **One primitive per step.** All three targets call the same five
+  primitives with the same inputs, so the identifiers in an evidence
+  record do not depend on the orchestrator that produced it.
 
 ## 7. Regulatory-graph closure
 

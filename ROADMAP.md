@@ -2535,6 +2535,15 @@ one playbook's provenance.
     strings; three targets regenerated from the YAML source;
     `experimental` → `stable`, `content_version` 1.0.0 on a recomputed
     checklist).
+  - CORE-WIRE + GRADUATE — #1068, closing #1066 (`network_security`:
+    all five action steps bound through `core_body`, each carrying its
+    `secops-ng-primitive` command in place of the manual one; the
+    topology stays linear, remediation runs on every window and
+    dispatches nothing on an empty violation set; the contract grows
+    from 6 to 23 variables, with lists and the default remediation
+    binding riding as JSON strings and the isolation posture stated
+    every run; three targets regenerated; `experimental` → `stable`,
+    `content_version` 1.0.0 on a recomputed checklist).
 
 ## Epic PT — Pattern Library
 
