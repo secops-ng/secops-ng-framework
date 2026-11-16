@@ -318,6 +318,13 @@
             "control.dora_submission_templates@v1",
             "control.incident_timeline_signals@v1"
           ],
+          "telemetry_refs": [
+            "telemetry.ocsf.incident_finding@v1"
+          ],
+          "metric_refs": [
+            "kpi.notification_sla_compliance@v1",
+            "kri.regulator_notification_overrun@v1"
+          ],
           "core_body": {
             "primitive": "content.playbooks.dora_major_incident_reporting.primitives.notification.compose_initial_notification",
             "in": {
@@ -367,6 +374,13 @@
           "control_refs": [
             "control.dora_submission_templates@v1",
             "control.incident_timeline_signals@v1"
+          ],
+          "telemetry_refs": [
+            "telemetry.ocsf.incident_finding@v1"
+          ],
+          "metric_refs": [
+            "kpi.notification_sla_compliance@v1",
+            "kri.regulator_notification_overrun@v1"
           ],
           "core_body": {
             "primitive": "content.playbooks.dora_major_incident_reporting.primitives.notification.compose_intermediate_report",
@@ -419,6 +433,13 @@
             "control.dora_submission_templates@v1",
             "control.incident_timeline_signals@v1"
           ],
+          "telemetry_refs": [
+            "telemetry.ocsf.incident_finding@v1"
+          ],
+          "metric_refs": [
+            "kpi.notification_sla_compliance@v1",
+            "kri.regulator_notification_overrun@v1"
+          ],
           "core_body": {
             "primitive": "content.playbooks.dora_major_incident_reporting.primitives.notification.compose_final_report",
             "in": {
@@ -468,6 +489,12 @@
           "control_refs": [
             "control.incident_timeline_signals@v1"
           ],
+          "telemetry_refs": [
+            "telemetry.ocsf.incident_finding@v1"
+          ],
+          "metric_refs": [
+            "kpi.timeline_completeness@v1"
+          ],
           "core_body": {
             "primitive": "content.playbooks.dora_major_incident_reporting.primitives.archive.compose_cycle_archive",
             "in": {
@@ -514,6 +541,14 @@
         "control.dora_major_classifier@v1",
         "control.dora_submission_templates@v1",
         "control.incident_timeline_signals@v1"
+      ],
+      "telemetry_refs": [
+        "telemetry.ocsf.incident_finding@v1"
+      ],
+      "metric_refs": [
+        "kpi.notification_sla_compliance@v1",
+        "kpi.timeline_completeness@v1",
+        "kri.regulator_notification_overrun@v1"
       ],
       "sources": [
         "OASIS CACAO v2.0 specification — workflow step types, variable conventions, x_ extension namespace",

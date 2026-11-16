@@ -8,6 +8,7 @@ import pytest
 from jsonschema import Draft202012Validator
 from referencing import Registry, Resource
 
+from compilers._shared.cacao_parser import secops_extension
 from content.playbooks.dora_major_incident_reporting.primitives import (
     MATERIALITY_CRITERIA,
     InvalidArchiveError,
@@ -263,3 +264,35 @@ def test_outputs_are_json_native() -> None:
     i = initial(c); m = intermediate(c, i); f = final(c, m)
     for out in (c, i, m, f, compose_cycle_archive(c, i, m, f, [], "wf:dora", "exec:1", "2026-10-20T09:00:00Z")):
         assert json.loads(json.dumps(out)) == out
+
+
+def test_each_step_stamps_what_it_measures() -> None:
+    """The three notifications measure their deadline (the SLA KPI and its overrun KRI); the archive, which
+    closes the cycle on both branches, measures timeline completeness. Classification measures nothing."""
+    c = major()
+    i = initial(c); m = intermediate(c, i); f = final(c, m)
+    notify = ["kpi.notification_sla_compliance@v1", "kri.regulator_notification_overrun@v1"]
+    assert [out["metric_stamps"] for out in (i, m, f)] == [notify] * 3
+    assert "metric_stamps" not in c
+    archive = compose_cycle_archive(c, i, m, f, [], "wf:dora", "exec:1", "2026-10-20T09:00:00Z")
+    not_major = classify_major_incident(INCIDENT, criteria(critical=False), CLASSIFIED)
+    closed = compose_cycle_archive(not_major, None, None, None, [], "wf:dora", "exec:1", "2026-10-20T09:00:00Z")
+    assert archive["metric_stamps"] == closed["metric_stamps"] == ["kpi.timeline_completeness@v1"]
+
+
+def test_every_stamp_is_declared_on_its_step_and_the_playbook() -> None:
+    """A stamp is a subset of the producing step's metric_refs, and the playbook declares every one."""
+    playbook = json.loads((REPO_ROOT / "content/playbooks/dora_major_incident_reporting/playbook.cacao.json")
+                          .read_text(encoding="utf-8"))
+    by_name = {s.get("name"): s for s in playbook["workflow"].values()}
+    c = major()
+    i = initial(c); m = intermediate(c, i); f = final(c, m)
+    a = compose_cycle_archive(c, i, m, f, [], "wf:dora", "exec:1", "2026-10-20T09:00:00Z")
+    produced = {"notify authority initial": i, "notify authority intermediate": m, "notify authority final": f,
+                "close and archive": a}
+    declared = set(secops_extension(playbook)["metric_refs"])
+    for name, out in produced.items():
+        step_refs = set(secops_extension(by_name[name])["metric_refs"])
+        assert set(out["metric_stamps"]) <= step_refs, name
+        assert step_refs <= declared, name
+
