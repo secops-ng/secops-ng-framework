@@ -28,9 +28,12 @@ entries:
       url: https://eur-lex.europa.eu/eli/reg/2022/2554/oj
     obligation: >-
       Ensure that contractual arrangements with ICT third-party service
-      providers include the elements specified in Article 30(2) and (3)
-      — including service description, data-processing locations,
-      exit-strategy obligations, audit rights, and termination rights.
+      providers include the elements specified in Article 30(2) —
+      including the service description, the locations of service
+      provision and data processing, data access and return, and
+      termination rights — and, for ICT services supporting critical or
+      important functions, Article 30(3) — including access, inspection
+      and audit rights and exit strategies with a transition period.
     status: draft
     control_refs:
       - control.provider_attestation@v1
@@ -42,10 +45,11 @@ entries:
       Article 30(2) sets the mandatory contractual clauses for every
       ICT third-party arrangement; Article 30(3) extends the closed
       clause set for arrangements supporting critical or important
-      functions (sub-contracting conditions, audit-and-inspection
-      rights against sub-outsourcers, dated exit-strategy obligations,
-      participation in threat-led penetration testing where
-      applicable). Two playbooks compose against this obligation
+      functions (full service level descriptions with performance
+      targets, notice and reporting obligations, tested business
+      contingency plans, participation in TLPT, access, inspection and
+      audit rights, and exit strategies with a mandatory transition
+      period). Two playbooks compose against this obligation
       surface. `playbook.contractual_obligations_tracker@v1` is the
       contract-time obligation-evidence stream: per-supplier accepted
       obligations, per-clause review cadence, and periodic re-
@@ -55,10 +59,8 @@ entries:
       contract-lifecycle spine; its contractual_provisions_check step
       is the deterministic per-clause presence/consistency check
       against the negotiated contract instance ahead of the Article
-      28 register-of-information entry, and its periodic_review step
-      re-runs the same clause-presence check on the review cadence.
+      28 register-of-information entry.
       control_refs are not extended here: both playbooks declare
       `control.provider_attestation@v1` already; additional control
       lifts (audit-rights coverage, sub-outsourcing clause coverage)
-      are deferred to follow-on cards once the per-clause primitive
-      set is fully authored on the CORE-PRIM sibling.
+      are deferred to follow-on cards.

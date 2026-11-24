@@ -2544,6 +2544,16 @@ one playbook's provenance.
     binding riding as JSON strings and the isolation posture stated
     every run; three targets regenerated; `experimental` → `stable`,
     `content_version` 1.0.0 on a recomputed checklist).
+  - CORE-PRIM — #1072 (`dora_tpr_management`: primitives for all five
+    action steps, from none, against Regulation (EU) 2022/2554 Art. 28
+    to 30; criticality read from the operator's function register and an
+    unlisted function refused, the Art. 28(4) and 28(5) preconditions
+    blocking, Art. 29 concentration and subcontracting weighed for a
+    critical or important function, Art. 30(1)-(3) checked clause by
+    clause with delegation only for a microenterprise's audit rights,
+    every arrangement registered compliant or not, the Art. 28(7)
+    termination grounds identified and never acted on, and the Art. 28(8)
+    exit strategy's readiness attested every cycle).
 
 ## Epic PT — Pattern Library
 

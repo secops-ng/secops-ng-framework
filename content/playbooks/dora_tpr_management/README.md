@@ -9,13 +9,81 @@ determination, sub-outsourcing surface, and exit-strategy discipline)
 and **Article 30** (key contractual provisions — the closed clause set
 every ICT third-party contract must carry).
 
-Status: **SKELETON**. Action steps are scaffolded as CACAO v2 actions
-with `control_refs` / `telemetry_refs` stubs; the per-step primitive
-bodies (deterministic pre-contractual risk-assessment rubric, Article
-30 clause-presence check, Article 28 register-row composition,
-periodic-review drift detection, and Article 28(8) exit-assessment
-attestation emission) are placeholders that a sibling CORE-PRIM card
-lands.
+Status: **CORE-PRIM**. Each of the five action steps has a deterministic
+primitive under `primitives/`; the steps are not bound to them yet. See
+Status below.
+
+## Status
+
+`maturity: experimental`. All five action steps have a deterministic
+primitive under `primitives/`, each executed directly by
+`tests/playbooks/dora_tpr_management/test_primitives.py`. The steps do
+not bind them yet: binding them through `core_body`, regenerating the
+three reference targets and recomputing the graduation checklist is the
+wire, the next stage.
+
+| Step | Primitive |
+|---|---|
+| onboarding risk assessment | `assessment.assess_onboarding_risk` |
+| contractual provisions check | `provisions.check_contractual_provisions` |
+| register entry | `register.compose_register_entry` |
+| periodic review | `review.review_arrangement` |
+| exit assessment | `exit.compose_exit_assessment` |
+
+Decisions the primitives fix, each against the text of Regulation (EU)
+2022/2554:
+
+- **Criticality is read, not scored.** Whether the arrangement covers
+  ICT services supporting a critical or important function (Art. 28(4)(a),
+  Art. 3(22)) is looked up in the operator's function register. DORA's
+  distinction is binary, so the determination is `critical_or_important`
+  or `not_critical_or_important`; a function the register does not list
+  is refused.
+- **Four preconditions block.** Supervisory conditions not met
+  (Art. 28(4)(b)), no due diligence (Art. 28(4)(d)), conflicts of
+  interest not assessed (Art. 28(4)(e)), and no information security
+  standard (Art. 28(5)). Whether to contract stays the entity's decision;
+  the assessment records why the preconditions are not met.
+- **Concentration is weighed for a critical or important function**
+  (Art. 29): a provider not easily substitutable, other such arrangements
+  with the same or a closely connected provider, subcontracting
+  permitted, a subcontractor or provider established outside the EU and
+  the EEA, and a chain longer than one tier. A planned arrangement on such
+  a function owes the competent authority notice (Art. 28(3), fifth
+  subparagraph).
+- **The clause set is Art. 30, point by point.** Art. 30(1) and the nine
+  elements of Art. 30(2) for every arrangement; Art. 30(3)(a)-(f), with
+  the four monitoring rights of point (e) separately, for a critical or
+  important function. Each clause is present, present with a recorded
+  deviation, or absent; `delegated` is accepted only for the access,
+  inspection and audit rights of a microenterprise, under the derogation
+  in Art. 30(3). A required clause with no status is refused.
+- **Every arrangement is registered** (Art. 28(3)), compliant or not, with
+  its criticality, preconditions and absent clauses on the row. Mapping
+  the row onto the standard templates of Commission Implementing
+  Regulation (EU) 2024/2956 is the register sink's work.
+- **The review identifies termination grounds and never acts on them.**
+  It re-reads criticality (a function that became critical or important
+  owes the competent authority notice), records the worst runtime
+  supply-chain verdict or `no_runtime_drift`, and lists the Art. 28(7)
+  circumstances that occurred: a significant breach (a), a material change
+  the entity deems capable of altering performance (b), a
+  `confirmed_compromise` verdict read as evidenced weakness in the
+  provider's ICT risk management (c), and supervision impeded (d).
+- **The exit step runs every cycle.** Without a trigger it attests the
+  Art. 28(8) exit strategy's readiness for a critical or important
+  function: a tested and reviewed plan within the operator's declared
+  period, alternative solutions, a transition plan, contingency measures,
+  and the Art. 30(3)(f) transition period in the contract. A trigger names
+  its Art. 28(7) or 28(8) basis, or the entity's own election.
+
+Owed to the wire, where the variable contract changes: the SKELETON
+describes criticality as operator buckets (`non_critical`, `important`,
+`critical`), an exit-trigger vocabulary (`periodic_review_failure`,
+`contractual_termination`, `provider_insolvency`,
+`regulatory_direction`), a clause set that is not Art. 30's, and a review
+that re-runs the clause check. The wire replaces those descriptions with
+what the primitives implement.
 
 ## Scope boundary
 
@@ -110,10 +178,10 @@ defer the content.
 
 | Step (playbook axis)              | Clause                                    |
 | --------------------------------- | ----------------------------------------- |
-| Pre-contractual risk assessment   | DORA Article 28(4)                        |
-| Contractual provisions check      | DORA Article 30(2) and 30(3)              |
+| Pre-contractual risk assessment   | DORA Article 28(4), 28(5) and 29          |
+| Contractual provisions check      | DORA Article 30(1), 30(2) and 30(3)       |
 | Register-of-information entry     | DORA Article 28(3); Commission ITS 2024/2956 |
-| Periodic review + drift detection | DORA Article 28(1)(a) monitoring cadence  |
+| Periodic review + drift detection | DORA Article 28(3) and 28(7)              |
 | Exit-strategy attestation         | DORA Article 28(8)                        |
 
 The inbound wiring at
